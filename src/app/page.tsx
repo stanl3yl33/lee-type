@@ -1,3 +1,9 @@
+import { Timer } from "@/components/Timer";
+
 export default function Home() {
-  return <div>sweet home alabama</div>;
+  return (
+    <div>
+      <Timer />
+    </div>
+  );
 }
