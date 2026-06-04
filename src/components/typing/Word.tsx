@@ -10,6 +10,11 @@ type WordProps = {
   wordState: string;
 };
 
+/**
+ * component that renders single word and style it based on correct / incorrect / in-progress
+ * @param props
+ * @returns
+ */
 export function ComponentName(props: ComponentNameProps) {
   return <div></div>;
 }

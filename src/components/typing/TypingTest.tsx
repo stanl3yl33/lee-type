@@ -36,6 +36,39 @@ export function TypingTest() {
 
   // possible props to consider for Word.tsx
 
+  // helper function for ignore keys not used for typing test:
+  function skipKeys(e: KeyboardEvent): boolean {
+    const ignored = new Set([
+      "Shift",
+      "Control",
+      "Alt",
+      "Meta", // Windows | Command key on mac
+      "CapsLock",
+      "Tab",
+      "Escape",
+      "Enter",
+      "ArrowUp",
+      "ArrowDown",
+      "ArrowLeft",
+      "ArrowRight",
+      "PageUp",
+      "PageDown",
+      "Home",
+      "End",
+      "Insert",
+      "Delete",
+      "ContextMenu",
+      "NumLock",
+      "ScrollLock",
+      "Pause",
+      "PrintScreen",
+    ]);
+
+    // returns true if any of the keys above are pressed
+    // if true -> input should be ignored / skipped
+    return ignored.has(e.key);
+  }
+
   // placeholder wordList
   const wordList = ["hi", "hello", "goodbye", "bruh", "this", "guy"];
   // useEffect - for keydown events regestering user input and 'clicking' for focusing on test?
@@ -48,7 +81,7 @@ export function TypingTest() {
         "code:",
         e.code,
         "type:",
-        e.type
+        e.type,
       );
 
       //   when this is pressed, accumulated string input put into accumulating list and move onto 'next word input'
@@ -73,6 +106,15 @@ export function TypingTest() {
 
         // clear typedInput to start next word
         setTypedInput("");
+      } else if (e.key === "Backspace" && e.ctrlKey) {
+        // case - current input is empty and backspace + ctrl => move onto next word
+        if (typedInput === "" && indexBoundary < currentWordIndex) {
+        } else {
+          console.log("deleting whole word");
+          setTypedInput("");
+        }
+
+        // need to apply same boundary logic. moving back to prev word:
       } else if (e.key === "Backspace") {
         // case for going back to prev words if boundary allows us to do so
         if (typedInput === "" && indexBoundary < currentWordIndex) {
@@ -97,15 +139,15 @@ export function TypingTest() {
             "index boundary = ",
             indexBoundary,
             "\ncurrent word index = ",
-            currentWordIndex
+            currentWordIndex,
           );
           console.log("word storage: ", wordStorage);
           return;
         }
-      } else if (e.key === "Backspace" && e.ctrlKey) {
-        console.log("deleting whole word");
       } else {
-        setTypedInput((prev) => prev + e.key);
+        if (skipKeys(e) === false) {
+          setTypedInput((prev) => prev + e.key);
+        }
       }
     };
 
