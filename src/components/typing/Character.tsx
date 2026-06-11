@@ -30,7 +30,14 @@ export function Character({
   let colorClass = theme.untyped;
 
   if (characterInput !== undefined) {
-    colorClass = characterInput === character ? theme.correct : theme.incorrect;
+    // colorClass = characterInput === character ? theme.correct : theme.incorrect;
+    // if character is undefined, the user has typed pass the word length -> always incorrect
+    colorClass =
+      character === undefined
+        ? theme.incorrect
+        : characterInput === character
+          ? theme.correct
+          : theme.incorrect;
   }
 
   return (
@@ -40,7 +47,8 @@ export function Character({
           className={`absolute left-0 top-1 bottom-1 w-0.5 ${theme.cursor} animate-pulse`}
         />
       )}
-      {character}
+      {/* Show incorrect character if typed pass expected last char in word */}
+      {character ?? characterInput}
     </span>
   );
 }
