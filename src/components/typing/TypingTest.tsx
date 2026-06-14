@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useReducer, useEffect, useState } from "react";
-
+import { useEffect, useState, useCallback } from "react";
+import { Timer } from "../Timer";
 // type ComponentNameProps = {};
 
 // export function TypingTest(props: ComponentNameProps) {
@@ -16,6 +16,22 @@ export function TypingTest() {
 
   // boundary in which the user can backspace. Should be set on the most newest correctly spelt word
   const [indexBoundary, setIndexBoundary] = useState<number>(0);
+
+  // timer control - temporary until full rewrite
+  const [isRunning, setIsRunning] = useState<boolean>(false);
+  const [isFinished, setIsFinished] = useState<boolean>(false);
+  const [resetSignal, setResetSignal] = useState<boolean>(false);
+
+  const handleFinish = useCallback(() => {
+    setIsFinished(true);
+    setIsRunning(false);
+  }, []);
+
+  const handleRestart = useCallback(() => {
+    setIsFinished(false);
+    setIsRunning(false);
+    setResetSignal((prev) => !prev);
+  }, []);
 
   // goals below:
   /**
@@ -164,6 +180,19 @@ export function TypingTest() {
 
   return (
     <div>
+      <Timer
+        isRunning={isRunning}
+        onFinish={handleFinish}
+        resetSignal={resetSignal}
+      />
+
+      {isFinished && <p className="text-white">Times up!</p>}
+
+      {/* temporary test buttons - removed in full rewrite */}
+      <button onClick={() => setIsRunning(true)}>start</button>
+      <button onClick={handleRestart}>restart</button>
+
+      {/* existing word list - untouched */}
       {wordList.map((item, index) => (
         <p key={index}>{item}</p>
       ))}
