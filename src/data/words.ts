@@ -1,3 +1,4 @@
+// to be replaced later on
 export const WORD_BANK: string[] = [
   "the",
   "be",
