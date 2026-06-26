@@ -1,5 +1,6 @@
 import TopNav from "@/components/Header";
 import Footer from "@/components/Footer";
+import "./globals.css"; // for tailwindcss
 
 export default function RootLayout({
   children,
