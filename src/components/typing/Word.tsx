@@ -14,8 +14,13 @@ export function Word({ word, typedWord, isActive }: WordProps) {
   // Handles case if user types more than the actual word count
   const maxLen = Math.max(word.length, typedWord.length);
 
+  const isCompletedIncorrect =
+    !isActive && typedWord !== "" && typedWord !== word;
+
   return (
-    <span className="inline-flex">
+    <span
+      className={`inline-flex ${isCompletedIncorrect ? "border-b-2 border-red-500" : ""}`}
+    >
       {Array.from({ length: maxLen }, (_, i) => {
         const expectedChar = word[i];
         const typedChar = typedWord[i];
