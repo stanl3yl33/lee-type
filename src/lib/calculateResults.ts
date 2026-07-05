@@ -2,7 +2,47 @@ export type TestResults = {
   wpm: number;
   rawWpm: number;
   accuracy: number;
+  characters: CharacterCounts;
 };
+export type CharacterCounts = {
+  correct: number;
+  incorrect: number;
+  extra: number;
+  missed: number;
+};
+
+function calculateCharacters(
+  wordList: string[],
+  wordStorage: string[],
+): CharacterCounts {
+  let correct = 0;
+  let incorrect = 0;
+  let extra = 0;
+  let missed = 0;
+
+  const count = Math.min(wordList.length, wordStorage.length);
+
+  for (let i = 0; i < count; i++) {
+    const typedWord = wordStorage[i];
+    const expectedWord = wordList[i];
+
+    for (let c = 0; c < typedWord.length; c++) {
+      if (c >= expectedWord.length) {
+        extra++;
+      } else if (typedWord[c] === expectedWord[c]) {
+        correct++;
+      } else {
+        incorrect++;
+      }
+    }
+
+    // only applies when typed word is shorter than the expected word
+    if (typedWord.length < expectedWord.length) {
+      missed += expectedWord.length - typedWord.length;
+    }
+  }
+  return { correct, incorrect, extra, missed };
+}
 
 /** calculates WPM based on correct words  */
 function calculateWPM(
@@ -62,5 +102,6 @@ export function calculateResults(
     wpm: calculateWPM(wordList, wordStorage, elapsedSeconds),
     rawWpm: calculateRawWPM(wordStorage, elapsedSeconds),
     accuracy: calculateAccuracy(wordList, wordStorage),
+    characters: calculateCharacters(wordList, wordStorage),
   };
 }

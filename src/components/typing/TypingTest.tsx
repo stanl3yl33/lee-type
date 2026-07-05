@@ -1,5 +1,6 @@
 "use client";
 
+import { ResultsScreen } from "./ResultScreen";
 import { useTypingGame } from "@/hooks/useTypingGame";
 import { Timer } from "../Timer";
 import { Word } from "./Word";
@@ -22,41 +23,37 @@ export function TypingTest() {
 
   return (
     <div className="max-w-3xl mx-auto p-8">
-      {/* countDown is now passed as a prop — Timer just displays it */}
-      <Timer countDown={countDown} />
-
       {isFinished ? (
-        // placeholder result screen
-        <div className="text-white">
-          <p>wpm: {results?.wpm}</p>
-          <p>raw wpm: {results?.rawWpm}</p>
-          <p>accuracy: {results?.accuracy}%</p>
-        </div>
+        <ResultsScreen results={results!} onRestart={handleRestart} />
       ) : (
-        <div className="flex flex-wrap gap-3 text-2xl leading-relaxed font-mono">
-          {wordList.map((word, index) => (
-            <Word
-              key={`${word}-${index}`}
-              word={word}
-              typedWord={
-                index < currentWordIndex
-                  ? (wordStorage[index] ?? "") // completed word
-                  : index === currentWordIndex
-                    ? typedInput // active word — live input
-                    : "" // future word
-              }
-              isActive={index === currentWordIndex}
-            />
-          ))}
-        </div>
-      )}
+        <>
+          <Timer countDown={countDown} />
 
-      <button
-        onClick={handleRestart}
-        className="mt-8 text-sm text-gray-500 hover:text-white transition-colors"
-      >
-        restart
-      </button>
+          <div className="flex flex-wrap gap-3 text-2xl leading-relaxed font-mono">
+            {wordList.map((word, index) => (
+              <Word
+                key={`${word}-${index}`}
+                word={word}
+                typedWord={
+                  index < currentWordIndex
+                    ? (wordStorage[index] ?? "")
+                    : index === currentWordIndex
+                      ? typedInput
+                      : ""
+                }
+                isActive={index === currentWordIndex}
+              />
+            ))}
+          </div>
+
+          <button
+            onClick={handleRestart}
+            className="mt-8 text-sm text-gray-500 hover:text-white transition-colors"
+          >
+            restart
+          </button>
+        </>
+      )}
     </div>
   );
 }
