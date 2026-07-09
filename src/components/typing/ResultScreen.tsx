@@ -8,12 +8,21 @@ type ResultsScreenProps = {
   results: TestResults;
   /** called when the user clicks restart */
   onRestart: () => void;
+  /** current selected game mode */
+  mode: "time" | "words";
+  /** how long the test actually took in seconds */
+  elapsedSeconds: number;
 };
 
 /**
  * Displays the results of a completed typing test.
  */
-export function ResultsScreen({ results, onRestart }: ResultsScreenProps) {
+export function ResultsScreen({
+  results,
+  onRestart,
+  mode,
+  elapsedSeconds,
+}: ResultsScreenProps) {
   const presetTime = useTypingSettingsStore((state) => state.timeMode.preset);
   const customTime = useTypingSettingsStore(
     (state) => state.timeMode.customDuration,
@@ -60,7 +69,6 @@ export function ResultsScreen({ results, onRestart }: ResultsScreenProps) {
                 {results.characters.extra}/{results.characters.missed}
               </p>
 
-              {/* tooltip — only shows label names to explain the order of the numbers */}
               <div
                 className="
       absolute bottom-full left-0 mb-2
@@ -79,7 +87,6 @@ export function ResultsScreen({ results, onRestart }: ResultsScreenProps) {
             </div>
           </div>
 
-          {/* consistency — placeholder until per-second WPM sampling is added */}
           <div>
             <p className="text-gray-500 text-sm">consistency</p>
             <p className="text-white text-2xl">—</p>
@@ -91,8 +98,17 @@ export function ResultsScreen({ results, onRestart }: ResultsScreenProps) {
           {/* test type */}
           <div>
             <p className="text-gray-500 text-sm">test type</p>
-            <p className="text-yellow-400">time {totalTime}</p>
-            <p className="text-yellow-400">english</p>
+            {mode === "time" ? (
+              <>
+                <p className="text-yellow-400">time {totalTime}</p>
+                <p className="text-yellow-400">english</p>
+              </>
+            ) : (
+              <>
+                <p className="text-yellow-400">words</p>
+                <p className="text-yellow-400">english</p>
+              </>
+            )}
           </div>
 
           {/* raw wpm */}
@@ -104,7 +120,14 @@ export function ResultsScreen({ results, onRestart }: ResultsScreenProps) {
           {/* time */}
           <div>
             <p className="text-gray-500 text-sm">time</p>
-            <p className="text-white text-2xl">{totalTime}s</p>
+            {mode === "time" ? (
+              <p className="text-white text-2xl">{totalTime}s</p>
+            ) : (
+              // word mode => show total amount of time taken to type all words
+              <p className="text-white text-2xl">
+                {Math.round(elapsedSeconds)}s
+              </p>
+            )}
           </div>
         </div>
       </div>

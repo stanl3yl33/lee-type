@@ -58,6 +58,16 @@ function skipKeys(e: KeyboardEvent): boolean {
  * Owns all the typing game state logic. TypingTest component just renders what the hook returns
  */
 export function useTypingGame() {
+  //Time mode settings
+  const mode = useTypingSettingsStore((state) => state.mode);
+  const wordPreset = useTypingSettingsStore((state) => state.wordMode.preset);
+  const customLength = useTypingSettingsStore(
+    (state) => state.wordMode.customLength,
+  );
+
+  // target word count for word mode
+  const targetWordCount = wordPreset === "custom" ? customLength : wordPreset;
+
   // read time settings from global store
   // when the user changes their preferred time in settings, this updates automatically
   const presetTime = useTypingSettingsStore((state) => state.timeMode.preset);
@@ -79,18 +89,48 @@ export function useTypingGame() {
 
   const [countDown, setCountDown] = useState<number>(totalTime);
   const [results, setResults] = useState<TestResults | null>(null);
+  const [elapsedSeconds, setElapsedSeconds] = useState<number>(0);
 
   const startTimeRef = useRef<number | null>(null);
   const hasFinishedRef = useRef<boolean>(false);
 
+  // helper method for handling finished test to reduce redundancy
+  const finishGame = useCallback(
+    (finalWordStorage: string[]) => {
+      if (hasFinishedRef.current) return;
+      hasFinishedRef.current = true;
+
+      setIsFinished(true);
+      setIsRunning(false);
+
+      const elapsed = startTimeRef.current
+        ? (Date.now() - startTimeRef.current) / 1000
+        : totalTime;
+
+      setElapsedSeconds(elapsed);
+      const finalResults = calculateResults(
+        wordList,
+        finalWordStorage,
+        elapsed,
+      );
+      setResults(finalResults);
+    },
+    [wordList, totalTime],
+  );
+
   // populate word list on mount
   useEffect(() => {
-    setWordList(generateWords());
-  }, []);
+    // setWordList(generateWords());
+    if (mode === "words") {
+      setWordList(generateWords(targetWordCount));
+    } else {
+      setWordList(generateWords());
+    }
+  }, [mode, targetWordCount]);
 
   // countdown interval: owned here instead of Timer to avoid race condition possibility
   useEffect(() => {
-    if (!isRunning) return;
+    if (!isRunning || mode === "words") return; // if mode === word -> safe guard it
     const id = setInterval(() => {
       setCountDown((prev) => {
         if (prev <= 1) {
@@ -101,30 +141,14 @@ export function useTypingGame() {
       });
     }, 1000);
     return () => clearInterval(id);
-  }, [isRunning]);
+  }, [isRunning, mode]);
 
-  // Finish condition - triggered when countDown hits zero
+  // Timer Finish condition - triggered when countDown hits zero
   useEffect(() => {
     if (countDown !== 0) return;
     if (hasFinishedRef.current) return;
-
-    // countDown is 0 and we haven't finished yet — end the game
-    hasFinishedRef.current = true;
-
-    setIsFinished(true);
-    setIsRunning(false);
-
-    const elapsedSeconds = startTimeRef.current
-      ? (Date.now() - startTimeRef.current) / 1000
-      : totalTime;
-
-    const finalResults = calculateResults(
-      wordList,
-      wordStorage,
-      elapsedSeconds,
-    );
-    setResults(finalResults);
-  }, [countDown, wordList, wordStorage, totalTime]);
+    finishGame(wordStorage);
+  }, [countDown, wordList, wordStorage, finishGame]);
 
   // reset countdown if totalTime changes while not running
   // handles the case where user changes time setting between tests in future
@@ -134,6 +158,22 @@ export function useTypingGame() {
     }
   }, [totalTime, isRunning]);
 
+  // Word Finish condition - trigger when the user types the last word
+  useEffect(() => {
+    if (mode !== "words") return; // safe guard against time mode
+    if (currentWordIndex < targetWordCount) return;
+    if (hasFinishedRef.current) return;
+
+    finishGame(wordStorage);
+  }, [
+    currentWordIndex,
+    mode,
+    targetWordCount,
+    wordList,
+    wordStorage,
+    finishGame,
+  ]);
+
   // restart game logic:
   const handleRestart = useCallback(() => {
     // reset refs first — synchronous, immediate
@@ -141,7 +181,10 @@ export function useTypingGame() {
     startTimeRef.current = null;
 
     // reset all game state
-    setWordList(generateWords());
+    // setWordList(generateWords());
+    setWordList(
+      mode === "words" ? generateWords(targetWordCount) : generateWords(),
+    );
     setTypedInput("");
     setCurrentWordIndex(0);
     setWordStorage([]);
@@ -150,7 +193,8 @@ export function useTypingGame() {
     setIsFinished(false);
     setCountDown(totalTime);
     setResults(null);
-  }, [totalTime]);
+    setElapsedSeconds(0);
+  }, [totalTime, mode, targetWordCount]);
 
   // keydown handler:
   useEffect(() => {
@@ -176,7 +220,12 @@ export function useTypingGame() {
         setTypedInput("");
 
         // append one new random word so the list never runs out
-        setWordList((prev) => [...prev, getRandomWord()]);
+        // setWordList((prev) => [...prev, getRandomWord()]);
+
+        if (mode === "time") {
+          // only append new random words in list for time
+          setWordList((prev) => [...prev, getRandomWord()]);
+        }
       } else if (e.key === "Backspace" && e.ctrlKey) {
         // ctrl+backspace — delete the whole current word
         if (typedInput === "" && indexBoundary < currentWordIndex) {
@@ -194,22 +243,30 @@ export function useTypingGame() {
           // delete the last character
           setTypedInput((prev) => prev.slice(0, -1));
         }
-        // else: empty input at boundary — do nothing
       } else if (!skipKeys(e)) {
         // start timer on very first real keystroke
         if (!isRunning) {
           setIsRunning(true);
           startTimeRef.current = Date.now();
         }
-        setTypedInput((prev) => prev + e.key);
+        // setTypedInput((prev) => prev + e.key);
+        const newInput = typedInput + e.key;
+        setTypedInput(newInput);
+        if (
+          mode === "words" &&
+          currentWordIndex === targetWordCount - 1 &&
+          newInput === wordList[currentWordIndex]
+        ) {
+          setWordStorage((prev) => [...prev, newInput]);
+          setCurrentWordIndex((prev) => prev + 1);
+          setTypedInput("");
+          finishGame([...wordStorage, newInput]); // pass update storage directly b/c states are async
+        }
       }
     };
 
     window.addEventListener("keydown", handleKeydown);
     return () => window.removeEventListener("keydown", handleKeydown);
-
-    // every piece of state read inside handleKeydown must be listed here
-    // omitting any of these causes stale closure bugs
   }, [
     isFinished,
     isRunning,
@@ -218,6 +275,9 @@ export function useTypingGame() {
     wordStorage,
     indexBoundary,
     wordList,
+    mode,
+    targetWordCount,
+    finishGame,
   ]);
 
   // return everything TypingTest needs to render
@@ -230,5 +290,12 @@ export function useTypingGame() {
     isFinished,
     results,
     handleRestart,
+    isRunning,
+    elapsedSeconds,
+    mode,
+    wordProgress: {
+      current: currentWordIndex,
+      total: targetWordCount,
+    },
   };
 }
