@@ -10,7 +10,7 @@ type ToggleGroupProps<T> = {
   onChange: (value: T) => void;
 };
 
-export function ToggleGropu<T>({
+export function ToggleGroup<T>({
   options,
   selected,
   onChange,

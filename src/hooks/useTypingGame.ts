@@ -57,7 +57,7 @@ function skipKeys(e: KeyboardEvent): boolean {
 /**
  * Owns all the typing game state logic. TypingTest component just renders what the hook returns
  */
-export function useTypingGame() {
+export function useTypingGame(isModalOpen: boolean = false) {
   //Time mode settings
   const mode = useTypingSettingsStore((state) => state.mode);
   const wordPreset = useTypingSettingsStore((state) => state.wordMode.preset);
@@ -202,6 +202,9 @@ export function useTypingGame() {
     if (isFinished) return;
 
     const handleKeydown = (e: KeyboardEvent) => {
+      // ignore all keystrokes while any modal is open to prevent test from starting
+      if (isModalOpen) return;
+
       if (e.key === " ") {
         e.preventDefault();
 
@@ -270,6 +273,7 @@ export function useTypingGame() {
   }, [
     isFinished,
     isRunning,
+    isModalOpen,
     typedInput,
     currentWordIndex,
     wordStorage,

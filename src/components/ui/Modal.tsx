@@ -5,7 +5,7 @@ import { useState } from "react";
 type ModalProps = {
   isOpen: boolean;
   title: string;
-  inputPlaceholder?: string;
+  defaultValue?: number; // prefill input bar with already preselected val at start
   description?: string;
   onApply: (value: number) => void;
   onClose: () => void;
@@ -17,12 +17,14 @@ type ModalProps = {
 export function Modal({
   isOpen,
   title,
-  inputPlaceholder,
+  defaultValue,
   description,
   onApply,
   onClose,
 }: ModalProps) {
-  const [input, setInput] = useState<string>("");
+  const [input, setInput] = useState<string>(
+    defaultValue !== undefined ? String(defaultValue) : "",
+  );
   if (!isOpen) return null;
 
   const handleApply = () => {
@@ -54,7 +56,6 @@ export function Modal({
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
           className="w-full bg-gray-800 text-white px-4 py-2 rounded mb-4 focus:outline-none focus:ring-1 focus:ring-yellow-400 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-          placeholder={inputPlaceholder}
           autoFocus
         />
 
