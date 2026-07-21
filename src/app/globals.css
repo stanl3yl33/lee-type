@@ -19,6 +19,7 @@
   --color-untyped: #b08fa3;
   --color-cursor: #e2b6cf;
   --color-accent: #e2b6cf;
+  --color-background: #2b1d2e;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -29,7 +30,7 @@
 }
 
 body {
-  background: var(--background);
+  background: var(--color-background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }

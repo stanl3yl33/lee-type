@@ -1,6 +1,7 @@
 import TopNav from "@/components/Header";
 import Footer from "@/components/Footer";
 import "./globals.css"; // for tailwindcss
+import { ThemeProvider } from "@/components/ThemeProvider";
 
 export default function RootLayout({
   children,
@@ -11,13 +12,15 @@ export default function RootLayout({
     <html lang="en">
       {/* child componnet is to be populated with page.tsx */}
       <body>
-        {/* top nav */}
-        <TopNav />
+        <ThemeProvider>
+          {/* top nav */}
+          <TopNav />
 
-        <main>{children}</main>
+          <main>{children}</main>
 
-        {/* footer on bottom */}
-        <Footer />
+          {/* footer on bottom */}
+          <Footer />
+        </ThemeProvider>
       </body>
     </html>
   );

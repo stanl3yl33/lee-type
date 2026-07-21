@@ -111,8 +111,8 @@ export function TypingTest() {
                 onClick={() => setShowCustomModal(true)}
                 className={`px-2 font-mono text-sm transition-colors ${
                   timePreset === "custom" || wordPreset === "custom"
-                    ? "text-yellow-400"
-                    : "text-gray-500 hover:text-white"
+                    ? "text-accent"
+                    : "text-untyped hover:text-correct"
                 }`}
               >
                 custom
@@ -122,7 +122,7 @@ export function TypingTest() {
           {mode === "time" ? (
             <Timer countDown={countDown} />
           ) : (
-            <div className="text-4xl font-medium text-gray-400 mb-6">
+            <div className="text-4xl font-medium text-accent mb-6">
               {wordProgress.current} /{" "}
               <span className="text-2xl">{wordProgress.total}</span>
             </div>
@@ -147,7 +147,7 @@ export function TypingTest() {
 
           <button
             onClick={handleRestart}
-            className="mt-8 text-sm text-gray-500 hover:text-white transition-colors"
+            className="mt-8 text-sm text-untyped hover:text-correct transition-colors"
           >
             restart
           </button>

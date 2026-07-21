@@ -23,8 +23,8 @@ export function ToggleGroup<T>({
           onClick={() => onChange(option.value)}
           className={`px-2 font-mono text-sm transition-colors ${
             selected === option.value
-              ? "text-yellow-400"
-              : "text-gray-500 hover:text-white"
+              ? "text-accent"
+              : "text-untyped hover:text-correct"
           }`}
         >
           {option.label}

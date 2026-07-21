@@ -45,29 +45,29 @@ export function Modal({
       onClick={onClose}
     >
       <div
-        className="bg-gray-900 rounded-lg p-8 w-96 font-mono"
+        className="bg-background rounded-lg p-8 w-96 font-mono"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-yellow-400 text-xl mb-4">{title}</h2>
+        <h2 className="text-accent text-xl mb-4">{title}</h2>
 
         <input
           type="number"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
-          className="w-full bg-gray-800 text-white px-4 py-2 rounded mb-4 focus:outline-none focus:ring-1 focus:ring-yellow-400 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+          className="w-full bg-correct/10 text-correct px-4 py-2 rounded mb-4 focus:outline-none focus:ring-1 focus:ring-accent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
           autoFocus
         />
 
         {description && (
-          <p className="text-gray-500 text-xs mb-4 leading-relaxed">
+          <p className="text-untyped text-xs mb-4 leading-relaxed">
             {description}
           </p>
         )}
 
         <button
           onClick={handleApply}
-          className="w-full bg-gray-800 hover:bg-gray-700 text-white py-2 rounded transition-colors"
+          className="w-full text-background bg-accent hover:opacity-90 py-2 rounded transition-opacity font-medium"
         >
           apply
         </button>
