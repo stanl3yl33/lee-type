@@ -1,24 +1,30 @@
+"use client";
+
 import Link from "next/link";
+import { IoSettingsOutline } from "react-icons/io5";
 
 export default function Header() {
   return (
-    <header className="flex">
-      {/* logo brings us to home page view as well */}
-      <div>Logo</div>
-      <nav>
-        {/* game / home view */}
-        <Link href="/" />
+    <header className="w-full px-8 py-4 font-mono">
+      <div className="max-w-5xl mx-auto flex items-center gap-6">
+        {/* logo */}
+        <Link
+          href="/"
+          className="text-accent text-lg font-medium tracking-wider"
+        >
+          lee-type
+        </Link>
 
-        {/* Leaderboard page */}
-        <Link href="/leaderboard" />
-
-        {/* Settings */}
-        <Link href="/settings" />
-
-        {/* Login page / account page based on if there is a current session or not - todo later*/}
-        <Link href="/login" />
-        <Link href="/account" />
-      </nav>
+        {/* center nav icons — more added as features are built */}
+        <div className="flex items-center gap-4 text-untyped">
+          <Link
+            href="/settings"
+            className="hover:text-accent transition-colors"
+          >
+            <IoSettingsOutline size={18} />
+          </Link>
+        </div>
+      </div>
     </header>
   );
 }
