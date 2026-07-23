@@ -128,7 +128,7 @@ export function TypingTest() {
             </div>
           )}
 
-          <div className="flex flex-wrap gap-3 text-2xl leading-relaxed font-mono">
+          <div className="flex flex-wrap gap-3 text-3xl leading-relaxed font-mono tracking-[0.2rem]">
             {wordList.map((word, index) => (
               <Word
                 key={`${word}-${index}`}

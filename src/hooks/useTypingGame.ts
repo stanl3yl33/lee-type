@@ -252,6 +252,11 @@ export function useTypingGame(isModalOpen: boolean = false) {
           setIsRunning(true);
           startTimeRef.current = Date.now();
         }
+
+        const currentWord = wordList[currentWordIndex];
+        const maxLength = currentWord ? currentWord.length + 10 : 20;
+        if (typedInput.length >= maxLength) return; // stop accepting input
+
         // setTypedInput((prev) => prev + e.key);
         const newInput = typedInput + e.key;
         setTypedInput(newInput);

@@ -1,6 +1,8 @@
+import useTypingSettingsStore from "@/store/useTypingSettingsStore";
+
 type CharacterProps = {
   /** Expected character from the word list */
-  character: string;
+  character: string | undefined;
   /**
    * What the user typed at this position.
    * Undefined if the cursor hasn't reach this position yet.
@@ -18,6 +20,7 @@ export function Character({
   characterInput,
   isCursor,
 }: CharacterProps) {
+  const caretStyle = useTypingSettingsStore((state) => state.caretStyle);
   // let colorClass = theme.untyped;
 
   // if (characterInput !== undefined) {
@@ -42,14 +45,22 @@ export function Character({
   }
 
   return (
-    <span className={`relative ${colorClass}`}>
-      {isCursor && (
-        <span
-          className={`absolute left-0 top-1 bottom-1 w-0.5 bg-cursor animate-pulse`}
-        />
+    <span className={`relative ${colorClass} inline-block`}>
+      {isCursor && caretStyle !== "off" && (
+        <>
+          {caretStyle === "default" && (
+            <span className="absolute left-0 top-1 bottom-1 w-0.5 bg-cursor animate-pulse" />
+          )}
+          {caretStyle === "block" && (
+            <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 animate-pulse rounded-sm w-[0.6em] h-[1.1em] bg-cursor opacity-35" />
+          )}
+          {caretStyle === "underline" && (
+            <span className="absolute bottom-0 left-1/2 -translate-x-1/2 h-px w-[0.55em] bg-cursor animate-pulse" />
+          )}
+        </>
       )}
       {/* Show incorrect character if typed pass expected last char in word */}
-      {character ?? characterInput}
+      <span className="relative z-10">{character ?? characterInput}</span>
     </span>
   );
 }

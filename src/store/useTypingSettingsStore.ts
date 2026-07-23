@@ -5,6 +5,8 @@ type TypingModeType = "time" | "words";
 type TimePresetType = 15 | 30 | 60 | 120 | "custom";
 type WordPresetType = 10 | 25 | 50 | 100 | "custom";
 
+type CaretStyle = "off" | "default" | "block" | "underline";
+
 type TypingSettingState = {
   mode: TypingModeType;
 
@@ -18,11 +20,14 @@ type TypingSettingState = {
     customLength: number;
   };
 
+  caretStyle: CaretStyle;
+
   setMode: (mode: TypingModeType) => void;
   setTimePreset: (value: TimePresetType) => void;
   setWordPreset: (value: WordPresetType) => void;
   setCustomTime: (value: number) => void;
   setCustomLength: (value: number) => void;
+  setCaretStyle: (stele: CaretStyle) => void;
 };
 
 // use 'persist' middleware such that the user's settings get saved across page reloads
@@ -44,6 +49,8 @@ const useTypingSettingsStore = create<TypingSettingState>()(
         customLength: 40,
       },
 
+      caretStyle: "default",
+
       // setter functions that call set()
       setMode: (mode) => set({ mode }),
 
@@ -59,7 +66,7 @@ const useTypingSettingsStore = create<TypingSettingState>()(
               // add the new preset:
               preset,
             },
-          })
+          }),
         ),
 
       setWordPreset: (preset) =>
@@ -73,7 +80,7 @@ const useTypingSettingsStore = create<TypingSettingState>()(
               // add the new preset:
               preset,
             },
-          })
+          }),
         ),
 
       // custom time and length setters:
@@ -96,11 +103,13 @@ const useTypingSettingsStore = create<TypingSettingState>()(
             customLength: customLengthVal,
           },
         })),
+
+      setCaretStyle: (caretStyle) => set({ caretStyle }),
     }),
     {
       name: "typing-settings-store", // key for localStorage
-    }
-  )
+    },
+  ),
 );
 
 export default useTypingSettingsStore;

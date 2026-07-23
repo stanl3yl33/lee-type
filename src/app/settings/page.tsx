@@ -2,32 +2,77 @@
 
 import useThemeStore from "@/store/useThemeStore";
 import { PRESET_THEMES, Theme } from "@/styles/themes";
+import useTypingSettingsStore from "@/store/useTypingSettingsStore";
+import { useState } from "react";
+import { ToggleGroup } from "@/components/ui/ToggleGroup";
 
 export default function SettingPage() {
   const activeTheme = useThemeStore((state) => state.activeTheme);
   const setActiveTheme = useThemeStore((state) => state.setActiveTheme);
+  const [toggleCaret, setToggleCaret] = useState<boolean>(true);
+
+  const caretStyle = useTypingSettingsStore((state) => state.caretStyle);
+  const setCaretStyle = useTypingSettingsStore((state) => state.setCaretStyle);
+  const [toggleTheme, setToggleTheme] = useState<boolean>(true);
 
   return (
     <div className="max-w-5xl mx-auto px-8 py-6 font-mono">
-      {/* theme section */}
+      {/* caret style section */}
       <section className="mb-12">
-        {/* section header */}
         <div className="flex items-center gap-4 mb-6">
-          <h2 className="text-untyped text-sm">theme</h2>
+          <button
+            className="text-untyped text-sm hover:text-accent transition-colors"
+            onClick={() => setToggleCaret(!toggleCaret)}
+          >
+            caret style
+          </button>
           <div className="h-px flex-1 bg-untyped opacity-20" />
+          <span className="text-untyped text-xs">
+            {toggleCaret ? "▾" : "▸"}
+          </span>
         </div>
 
-        {/* preset theme grid */}
-        <div className="grid grid-cols-3 gap-2">
-          {PRESET_THEMES.map((theme) => (
-            <ThemeButton
-              key={theme.name}
-              theme={theme}
-              isActive={activeTheme.name === theme.name}
-              onSelect={() => setActiveTheme(theme)}
-            />
-          ))}
+        {toggleCaret && (
+          <ToggleGroup
+            options={[
+              { label: "off", value: "off" },
+              { label: "default", value: "default" },
+              { label: "block", value: "block" },
+              { label: "underline", value: "underline" },
+            ]}
+            selected={caretStyle}
+            onChange={setCaretStyle}
+          />
+        )}
+      </section>
+
+      {/* theme section */}
+      <section className="mb-12">
+        <div className="flex items-center gap-4 mb-6">
+          <button
+            className="text-untyped text-sm hover:text-accent transition-colors"
+            onClick={() => setToggleTheme((prev) => !prev)}
+          >
+            theme
+          </button>
+          <div className="h-px flex-1 bg-untyped opacity-20" />
+          <span className="text-untyped text-xs">
+            {toggleTheme ? "▾" : "▸"}
+          </span>
         </div>
+
+        {toggleTheme && (
+          <div className="grid grid-cols-3 gap-2">
+            {PRESET_THEMES.map((theme) => (
+              <ThemeButton
+                key={theme.name}
+                theme={theme}
+                isActive={activeTheme.name === theme.name}
+                onSelect={() => setActiveTheme(theme)}
+              />
+            ))}
+          </div>
+        )}
       </section>
     </div>
   );
