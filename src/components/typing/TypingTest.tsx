@@ -11,6 +11,11 @@ import { Modal } from "../ui/Modal";
 
 const TIME_PRESETS = [15, 30, 60, 120] as const;
 const WORD_PRESETS = [10, 25, 50, 100] as const;
+const FONT_SIZE_CLASSES: Record<string, string> = {
+  small: "text-xl",
+  medium: "text-3xl",
+  large: "text-5xl",
+};
 
 /**
  * Core typing test component
@@ -48,6 +53,9 @@ export function TypingTest() {
   const customLength = useTypingSettingsStore(
     (state) => state.wordMode.customLength,
   );
+
+  const fontSize = useTypingSettingsStore((state) => state.fontSize);
+  const fontSizeClass = FONT_SIZE_CLASSES[fontSize];
 
   const handleCustomApply = (value: number) => {
     if (mode === "time") {
@@ -128,7 +136,9 @@ export function TypingTest() {
             </div>
           )}
 
-          <div className="flex flex-wrap gap-3 text-3xl leading-relaxed font-mono tracking-[0.2rem]">
+          <div
+            className={`flex flex-wrap gap-3 ${fontSizeClass} leading-relaxed font-mono tracking-[0.2rem]`}
+          >
             {wordList.map((word, index) => (
               <Word
                 key={`${word}-${index}`}

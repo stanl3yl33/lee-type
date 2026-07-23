@@ -15,8 +15,38 @@ export default function SettingPage() {
   const setCaretStyle = useTypingSettingsStore((state) => state.setCaretStyle);
   const [toggleTheme, setToggleTheme] = useState<boolean>(true);
 
+  const fontSize = useTypingSettingsStore((state) => state.fontSize);
+  const setFontSize = useTypingSettingsStore((state) => state.setFontSize);
+  const [toggleFont, setToggleFont] = useState<boolean>(true);
+
   return (
     <div className="max-w-5xl mx-auto px-8 py-6 font-mono">
+      {/* font size section */}
+      <section className="mb-12">
+        <div className="flex items-center gap-4 mb-6">
+          <button
+            className="text-untyped text-sm hover:text-accent transition-colors"
+            onClick={() => setToggleFont(!toggleFont)}
+          >
+            font size
+          </button>
+          <div className="h-px flex-1 bg-untyped opacity-20" />
+          <span className="text-untyped text-xs">{toggleFont ? "▾" : "▸"}</span>
+        </div>
+
+        {toggleFont && (
+          <ToggleGroup
+            options={[
+              { label: "small", value: "small" },
+              { label: "medium", value: "medium" },
+              { label: "large", value: "large" },
+            ]}
+            selected={fontSize}
+            onChange={setFontSize}
+          />
+        )}
+      </section>
+
       {/* caret style section */}
       <section className="mb-12">
         <div className="flex items-center gap-4 mb-6">
@@ -51,7 +81,7 @@ export default function SettingPage() {
         <div className="flex items-center gap-4 mb-6">
           <button
             className="text-untyped text-sm hover:text-accent transition-colors"
-            onClick={() => setToggleTheme((prev) => !prev)}
+            onClick={() => setToggleTheme(!toggleTheme)}
           >
             theme
           </button>
