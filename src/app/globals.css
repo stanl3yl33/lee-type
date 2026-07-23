@@ -13,7 +13,6 @@
 }
 
 @theme {
-  /* typing test theme colors — NOT inline so they stay as var() references */
   --color-correct: #e2b6cf;
   --color-incorrect: #ca4754;
   --color-untyped: #b08fa3;
@@ -30,7 +29,7 @@
 }
 
 body {
-  background: var(--color-background);
+  /* background: var(--color-background); */
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }

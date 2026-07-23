@@ -1,12 +1,3 @@
-import React from "react";
-
-const theme = {
-  untyped: "text-gray-500",
-  correct: "text-white",
-  incorrect: "text-red-500",
-  cursor: "bg-yellow-400",
-};
-
 type CharacterProps = {
   /** Expected character from the word list */
   character: string;
@@ -54,7 +45,7 @@ export function Character({
     <span className={`relative ${colorClass}`}>
       {isCursor && (
         <span
-          className={`absolute left-0 top-1 bottom-1 w-0.5 ${theme.cursor} animate-pulse`}
+          className={`absolute left-0 top-1 bottom-1 w-0.5 bg-cursor animate-pulse`}
         />
       )}
       {/* Show incorrect character if typed pass expected last char in word */}

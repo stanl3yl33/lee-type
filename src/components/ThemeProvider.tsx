@@ -16,6 +16,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
           "--color-cursor": theme.cursor,
           "--color-accent": theme.accent,
           "--color-background": theme.background,
+          backgroundColor: theme.background,
           minHeight: "100vh",
         } as React.CSSProperties
       }

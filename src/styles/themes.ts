@@ -10,15 +10,6 @@ export type Theme = {
 
 // Built-in preset themes
 export const PRESET_THEMES: Theme[] = [
-  //   {
-  //     name: "bingsu",
-  //     correct: "#e2b6cf",
-  //     incorrect: "#ca4754",
-  //     untyped: "#b08fa3",
-  //     cursor: "#e2b6cf",
-  //     background: "#2b1d2e",
-  //     accent: "#e2b6cf",
-  //   },
   {
     name: "bingsu",
     correct: "#f0d6e8", // lighter pink — more contrast against untyped
@@ -27,6 +18,15 @@ export const PRESET_THEMES: Theme[] = [
     cursor: "#f0d6e8",
     background: "#2b1d2e",
     accent: "#f0d6e8",
+  },
+  {
+    name: "botanical",
+    correct: "#f0f0e8", // off-white — clearly typed
+    incorrect: "#cc4444", // red for errors
+    untyped: "#5a7a6a", // muted dark green — dimmed
+    cursor: "#f0f0e8",
+    background: "#6b8f7a", // sage green background
+    accent: "#f0f0e8",
   },
   {
     name: "dark",
