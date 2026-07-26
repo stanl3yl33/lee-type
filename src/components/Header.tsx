@@ -5,7 +5,7 @@ import { IoSettingsOutline } from "react-icons/io5";
 
 export default function Header() {
   return (
-    <header className="w-full px-8 py-4 font-mono">
+    <header className="w-full px-8 py-4">
       <div className="max-w-5xl mx-auto flex items-center gap-6">
         {/* logo */}
         <Link

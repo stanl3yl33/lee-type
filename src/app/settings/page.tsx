@@ -17,10 +17,12 @@ export default function SettingPage() {
 
   const fontSize = useTypingSettingsStore((state) => state.fontSize);
   const setFontSize = useTypingSettingsStore((state) => state.setFontSize);
+  const fontFamily = useTypingSettingsStore((state) => state.fontFamily);
+  const setFontFamily = useTypingSettingsStore((state) => state.setFontFamily);
   const [toggleFont, setToggleFont] = useState<boolean>(true);
 
   return (
-    <div className="max-w-5xl mx-auto px-8 py-6 font-mono">
+    <div className="max-w-5xl mx-auto px-8 py-6">
       {/* font size section */}
       <section className="mb-12">
         <div className="flex items-center gap-4 mb-6">
@@ -28,22 +30,78 @@ export default function SettingPage() {
             className="text-untyped text-sm hover:text-accent transition-colors"
             onClick={() => setToggleFont(!toggleFont)}
           >
-            font size
+            font
           </button>
           <div className="h-px flex-1 bg-untyped opacity-20" />
           <span className="text-untyped text-xs">{toggleFont ? "▾" : "▸"}</span>
         </div>
 
         {toggleFont && (
-          <ToggleGroup
-            options={[
-              { label: "small", value: "small" },
-              { label: "medium", value: "medium" },
-              { label: "large", value: "large" },
-            ]}
-            selected={fontSize}
-            onChange={setFontSize}
-          />
+          <div className="flex flex-col gap-8">
+            {/* font size */}
+            <div>
+              <p className="text-untyped text-xs mb-3">size</p>
+              <ToggleGroup
+                options={[
+                  { label: "small", value: "small" },
+                  { label: "medium", value: "medium" },
+                  { label: "large", value: "large" },
+                ]}
+                selected={fontSize}
+                onChange={setFontSize}
+              />
+            </div>
+            <div>
+              <p className="text-untyped text-xs mb-3">Font Family</p>
+
+              <ToggleGroup
+                options={[
+                  {
+                    label: "Geist Mono",
+                    value: "geist-mono",
+                    style: { fontFamily: "var(--font-geist-mono)" },
+                  },
+                  {
+                    label: "Fira Code",
+                    value: "fira-code",
+                    style: { fontFamily: "var(--font-fira-code)" },
+                  },
+                  {
+                    label: "JetBrains Mono",
+                    value: "jetbrains-mono",
+                    style: { fontFamily: "var(--font-jetbrains-mono)" },
+                  },
+                  {
+                    label: "Roboto Mono",
+                    value: "roboto-mono",
+                    style: { fontFamily: "var(--font-roboto-mono)" },
+                  },
+                  {
+                    label: "Space Mono",
+                    value: "space-mono",
+                    style: { fontFamily: "var(--font-space-mono)" },
+                  },
+                  {
+                    label: "Courier Prime",
+                    value: "courier-prime",
+                    style: { fontFamily: "var(--font-courier-prime)" },
+                  },
+                  {
+                    label: "Nunito",
+                    value: "nunito",
+                    style: { fontFamily: "var(--font-nunito)" },
+                  },
+                  {
+                    label: "Comic Neue",
+                    value: "comic-neue",
+                    style: { fontFamily: "var(--font-comic-neue)" },
+                  },
+                ]}
+                selected={fontFamily}
+                onChange={setFontFamily}
+              />
+            </div>
+          </div>
         )}
       </section>
 

@@ -117,7 +117,7 @@ export function TypingTest() {
               {/* custom option */}
               <button
                 onClick={() => setShowCustomModal(true)}
-                className={`px-2 font-mono text-sm transition-colors ${
+                className={`px-2  text-sm transition-colors ${
                   timePreset === "custom" || wordPreset === "custom"
                     ? "text-accent"
                     : "text-untyped hover:text-correct"
@@ -137,7 +137,7 @@ export function TypingTest() {
           )}
 
           <div
-            className={`flex flex-wrap gap-3 ${fontSizeClass} leading-relaxed font-mono tracking-[0.2rem]`}
+            className={`flex flex-wrap gap-3 ${fontSizeClass} leading-relaxed  tracking-[0.2rem]`}
           >
             {wordList.map((word, index) => (
               <Word

@@ -30,7 +30,7 @@ export function ResultsScreen({
   const totalTime = presetTime === "custom" ? customTime : presetTime;
 
   return (
-    <div className="w-full font-mono">
+    <div className="w-full">
       {/* main stats row */}
       <div className="flex gap-12 items-start">
         {/* left column */}
@@ -69,7 +69,7 @@ export function ResultsScreen({
               <div
                 className="
                 absolute bottom-full left-0 mb-2
-                bg-gray-800 text-gray-300 text-xs font-mono
+                bg-gray-800 text-gray-300 text-xs 
                 rounded px-3 py-2 whitespace-nowrap
                 invisible group-hover:visible
                 opacity-0 group-hover:opacity-100

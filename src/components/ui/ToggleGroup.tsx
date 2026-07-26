@@ -2,6 +2,7 @@
 type ToggleOptions<T> = {
   label: string;
   value: T;
+  style?: React.CSSProperties;
 };
 
 type ToggleGroupProps<T> = {
@@ -21,11 +22,12 @@ export function ToggleGroup<T>({
         <button
           key={String(option.value)}
           onClick={() => onChange(option.value)}
-          className={`px-2 font-mono text-sm transition-colors ${
+          className={`px-2 text-sm transition-colors ${
             selected === option.value
               ? "text-accent"
               : "text-untyped hover:text-correct"
           }`}
+          style={option.style}
         >
           {option.label}
         </button>

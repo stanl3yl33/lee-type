@@ -6,7 +6,17 @@ type TimePresetType = 15 | 30 | 60 | 120 | "custom";
 type WordPresetType = 10 | 25 | 50 | 100 | "custom";
 
 type CaretStyle = "off" | "default" | "block" | "underline";
+
 type FontSize = "small" | "medium" | "large";
+type FontFamily =
+  | "geist-mono"
+  | "fira-code"
+  | "jetbrains-mono"
+  | "roboto-mono"
+  | "space-mono"
+  | "courier-prime"
+  | "nunito"
+  | "comic-neue";
 
 type TypingSettingState = {
   mode: TypingModeType;
@@ -23,6 +33,7 @@ type TypingSettingState = {
 
   caretStyle: CaretStyle;
   fontSize: FontSize;
+  fontFamily: FontFamily;
 
   setMode: (mode: TypingModeType) => void;
   setTimePreset: (value: TimePresetType) => void;
@@ -31,6 +42,7 @@ type TypingSettingState = {
   setCustomLength: (value: number) => void;
   setCaretStyle: (style: CaretStyle) => void;
   setFontSize: (size: FontSize) => void;
+  setFontFamily: (font: FontFamily) => void;
 };
 
 // use 'persist' middleware such that the user's settings get saved across page reloads
@@ -55,6 +67,8 @@ const useTypingSettingsStore = create<TypingSettingState>()(
       caretStyle: "default",
 
       fontSize: "medium",
+
+      fontFamily: "geist-mono",
 
       // setter functions that call set()
       setMode: (mode) => set({ mode }),
@@ -111,6 +125,7 @@ const useTypingSettingsStore = create<TypingSettingState>()(
 
       setCaretStyle: (caretStyle) => set({ caretStyle }),
       setFontSize: (fontSize) => set({ fontSize }),
+      setFontFamily: (fontFamily) => set({ fontFamily }),
     }),
     {
       name: "typing-settings-store", // key for localStorage
