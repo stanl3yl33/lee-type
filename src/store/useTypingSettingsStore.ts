@@ -18,6 +18,8 @@ type FontFamily =
   | "nunito"
   | "comic-neue";
 
+type QuickRestart = "off" | "tab" | "esc" | "enter";
+
 type TypingSettingState = {
   mode: TypingModeType;
 
@@ -34,6 +36,7 @@ type TypingSettingState = {
   caretStyle: CaretStyle;
   fontSize: FontSize;
   fontFamily: FontFamily;
+  quickRestart: QuickRestart;
 
   setMode: (mode: TypingModeType) => void;
   setTimePreset: (value: TimePresetType) => void;
@@ -43,93 +46,45 @@ type TypingSettingState = {
   setCaretStyle: (style: CaretStyle) => void;
   setFontSize: (size: FontSize) => void;
   setFontFamily: (font: FontFamily) => void;
+  setQuickRestart: (key: QuickRestart) => void;
 };
 
 // use 'persist' middleware such that the user's settings get saved across page reloads
 const useTypingSettingsStore = create<TypingSettingState>()(
   persist(
-    (set) => ({
-      // default mode = time
+    (set): TypingSettingState => ({
       mode: "time",
-
-      // default settings for timeMode
       timeMode: {
         preset: 30,
         customDuration: 60,
       },
-
-      // default setting for wordMode
       wordMode: {
         preset: 25,
         customLength: 40,
       },
-
       caretStyle: "default",
-
       fontSize: "medium",
-
       fontFamily: "geist-mono",
-
-      // setter functions that call set()
+      quickRestart: "off",
       setMode: (mode) => set({ mode }),
-
-      // syntax of set: set((state) => newState)
       setTimePreset: (preset) =>
-        set(
-          // taking the current state s and modifying the timeMode state:
-          (s) => ({
-            timeMode: {
-              // spread what is currently in the timeMode
-              ...s.timeMode,
-
-              // add the new preset:
-              preset,
-            },
-          }),
-        ),
-
+        set((s) => ({ timeMode: { ...s.timeMode, preset } })),
       setWordPreset: (preset) =>
-        set(
-          // taking the current state s and modifying the wordMode state:
-          (s) => ({
-            wordMode: {
-              // spread what is currently in the wordMode
-              ...s.wordMode,
-
-              // add the new preset:
-              preset,
-            },
-          }),
-        ),
-
-      // custom time and length setters:
+        set((s) => ({ wordMode: { ...s.wordMode, preset } })),
       setCustomTime: (customTime) =>
         set((s) => ({
-          timeMode: {
-            ...s.timeMode,
-
-            // modifying the customTime
-            customDuration: customTime,
-          },
+          timeMode: { ...s.timeMode, customDuration: customTime },
         })),
-
       setCustomLength: (customLengthVal) =>
         set((s) => ({
-          wordMode: {
-            ...s.wordMode,
-
-            // modifying the customLength
-            customLength: customLengthVal,
-          },
+          wordMode: { ...s.wordMode, customLength: customLengthVal },
         })),
-
       setCaretStyle: (caretStyle) => set({ caretStyle }),
       setFontSize: (fontSize) => set({ fontSize }),
       setFontFamily: (fontFamily) => set({ fontFamily }),
+      setQuickRestart: (quickRestart) => set({ quickRestart }),
     }),
-    {
-      name: "typing-settings-store", // key for localStorage
-    },
+    { name: "typing-settings-store" },
   ),
 );
 

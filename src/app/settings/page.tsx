@@ -21,8 +21,29 @@ export default function SettingPage() {
   const setFontFamily = useTypingSettingsStore((state) => state.setFontFamily);
   const [toggleFont, setToggleFont] = useState<boolean>(true);
 
+  const quickRestart = useTypingSettingsStore((state) => state.quickRestart);
+  const setQuickRestart = useTypingSettingsStore(
+    (state) => state.setQuickRestart,
+  );
+
   return (
     <div className="max-w-5xl mx-auto px-8 py-6">
+      {/* behavior / quick restart section */}
+      {/* quick restart */}
+      <div>
+        <p className="text-untyped text-xs mb-3">quick restart</p>
+        <ToggleGroup
+          options={[
+            { label: "off", value: "off" },
+            { label: "tab", value: "tab" },
+            { label: "esc", value: "esc" },
+            { label: "enter", value: "enter" },
+          ]}
+          selected={quickRestart}
+          onChange={setQuickRestart}
+        />
+      </div>
+
       {/* font size section */}
       <section className="mb-12">
         <div className="flex items-center gap-4 mb-6">

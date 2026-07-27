@@ -64,6 +64,7 @@ export function useTypingGame(isModalOpen: boolean = false) {
   const customLength = useTypingSettingsStore(
     (state) => state.wordMode.customLength,
   );
+  const quickRestart = useTypingSettingsStore((state) => state.quickRestart);
 
   // target word count for word mode
   const targetWordCount = wordPreset === "custom" ? customLength : wordPreset;
@@ -195,6 +196,28 @@ export function useTypingGame(isModalOpen: boolean = false) {
     setResults(null);
     setElapsedSeconds(0);
   }, [totalTime, mode, targetWordCount]);
+
+  // quick restart logic
+  useEffect(() => {
+    if (quickRestart === "off") return;
+
+    const handleQuickRestart = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.tagName === "INPUT" || target.tagName === "TEXTAREA") return;
+
+      if (
+        (e.key === "Tab" && quickRestart === "tab") ||
+        (e.key === "Escape" && quickRestart === "esc") ||
+        (e.key === "Enter" && quickRestart === "enter")
+      ) {
+        e.preventDefault();
+        handleRestart();
+      }
+    };
+
+    window.addEventListener("keydown", handleQuickRestart);
+    return () => window.removeEventListener("keydown", handleQuickRestart);
+  }, [quickRestart, handleRestart]);
 
   // keydown handler:
   useEffect(() => {
