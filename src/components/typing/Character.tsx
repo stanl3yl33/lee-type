@@ -37,7 +37,7 @@ export function Character({
 
   if (characterInput !== undefined) {
     if (character === undefined) {
-      colorClass = "text-incorrect";
+      colorClass = "text-extra-error";
     } else {
       colorClass =
         characterInput === character ? "text-correct" : "text-incorrect";

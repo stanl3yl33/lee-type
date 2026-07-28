@@ -15,12 +15,12 @@
 @theme {
   --color-correct: #e2b6cf;
   --color-incorrect: #ca4754;
+  --color-extra-error: #7e2a33;
   --color-untyped: #b08fa3;
   --color-cursor: #e2b6cf;
   --color-accent: #e2b6cf;
   --color-background: #2b1d2e;
 }
-
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;

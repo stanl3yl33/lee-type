@@ -24,6 +24,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         {
           "--color-correct": theme.correct,
           "--color-incorrect": theme.incorrect,
+          "--color-extra-error": theme.extraError,
           "--color-untyped": theme.untyped,
           "--color-cursor": theme.cursor,
           "--color-accent": theme.accent,
