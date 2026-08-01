@@ -21,18 +21,7 @@ export function Character({
   isCursor,
 }: CharacterProps) {
   const caretStyle = useTypingSettingsStore((state) => state.caretStyle);
-  // let colorClass = theme.untyped;
 
-  // if (characterInput !== undefined) {
-  //   // colorClass = characterInput === character ? theme.correct : theme.incorrect;
-  //   // if character is undefined, the user has typed pass the word length -> always incorrect
-  //   colorClass =
-  //     character === undefined
-  //       ? theme.incorrect
-  //       : characterInput === character
-  //         ? theme.correct
-  //         : theme.incorrect;
-  // }
   let colorClass = "text-untyped";
 
   if (characterInput !== undefined) {

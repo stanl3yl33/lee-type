@@ -5,21 +5,28 @@ import { PRESET_THEMES, Theme } from "@/styles/themes";
 import useTypingSettingsStore from "@/store/useTypingSettingsStore";
 import { useState } from "react";
 import { ToggleGroup } from "@/components/ui/ToggleGroup";
+import { ConfirmModal } from "@/components/ui/ConfirmModal";
+import { CustomThemeCreator } from "@/components/settings/CustomThemeCreator";
 
 export default function SettingPage() {
   const activeTheme = useThemeStore((state) => state.activeTheme);
   const setActiveTheme = useThemeStore((state) => state.setActiveTheme);
-  const [toggleCaret, setToggleCaret] = useState<boolean>(true);
+  const customThemes = useThemeStore((state) => state.customThemes);
+  const removeCustomTheme = useThemeStore((state) => state.removeCustomTheme);
+  const [toggleTheme, setToggleTheme] = useState<boolean>(true);
 
   const caretStyle = useTypingSettingsStore((state) => state.caretStyle);
   const setCaretStyle = useTypingSettingsStore((state) => state.setCaretStyle);
-  const [toggleTheme, setToggleTheme] = useState<boolean>(true);
+  const [toggleCaret, setToggleCaret] = useState<boolean>(true);
 
   const fontSize = useTypingSettingsStore((state) => state.fontSize);
   const setFontSize = useTypingSettingsStore((state) => state.setFontSize);
   const fontFamily = useTypingSettingsStore((state) => state.fontFamily);
   const setFontFamily = useTypingSettingsStore((state) => state.setFontFamily);
   const [toggleFont, setToggleFont] = useState<boolean>(true);
+
+  const [themeView, setThemeView] = useState<"preset" | "custom">("preset");
+  const [pendingDelete, setPendingDelete] = useState<string | null>(null);
 
   const quickRestart = useTypingSettingsStore((state) => state.quickRestart);
   const setQuickRestart = useTypingSettingsStore(
@@ -171,18 +178,92 @@ export default function SettingPage() {
         </div>
 
         {toggleTheme && (
-          <div className="grid grid-cols-3 gap-2">
-            {PRESET_THEMES.map((theme) => (
-              <ThemeButton
-                key={theme.name}
-                theme={theme}
-                isActive={activeTheme.name === theme.name}
-                onSelect={() => setActiveTheme(theme)}
-              />
-            ))}
+          <div className="flex flex-col gap-6">
+            {/* preset / custom toggle */}
+            <div className="flex gap-2">
+              <button
+                onClick={() => setThemeView("preset")}
+                className={`px-4 py-1.5 rounded text-sm transition-colors ${
+                  themeView === "preset"
+                    ? "text-background bg-accent"
+                    : "text-untyped hover:text-correct"
+                }`}
+              >
+                preset
+              </button>
+              <button
+                onClick={() => setThemeView("custom")}
+                className={`px-4 py-1.5 rounded text-sm transition-colors ${
+                  themeView === "custom"
+                    ? "text-background bg-accent"
+                    : "text-untyped hover:text-correct"
+                }`}
+              >
+                custom
+              </button>
+            </div>
+
+            {/* preset grid or custom creator based on toggle */}
+            {themeView === "preset" ? (
+              <div className="flex flex-col gap-6">
+                <div className="grid grid-cols-3 gap-2">
+                  {PRESET_THEMES.map((theme) => (
+                    <ThemeButton
+                      key={theme.name}
+                      theme={theme}
+                      isActive={activeTheme.name === theme.name}
+                      onSelect={() => setActiveTheme(theme)}
+                    />
+                  ))}
+                </div>
+
+                {customThemes.length > 0 && (
+                  <div className="flex flex-col gap-3">
+                    <p className="text-untyped text-xs">custom</p>
+                    <div className="grid grid-cols-3 gap-2">
+                      {customThemes.map((theme: Theme) => (
+                        <div key={theme.name} className="relative group">
+                          <ThemeButton
+                            theme={theme}
+                            isActive={activeTheme.name === theme.name}
+                            onSelect={() => setActiveTheme(theme)}
+                          />
+                          {/* delete button */}
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setPendingDelete(theme.name);
+                            }}
+                            className="absolute top-1 right-1 w-5 h-5 rounded-full bg-incorrect text-background text-xs items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity flex"
+                          >
+                            &times;
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <CustomThemeCreator />
+            )}
           </div>
         )}
       </section>
+      <ConfirmModal
+        isOpen={pendingDelete !== null}
+        message={`delete "${pendingDelete}"?`}
+        onConfirm={() => {
+          if (pendingDelete) {
+            removeCustomTheme(pendingDelete);
+            if (activeTheme.name === pendingDelete) {
+              setActiveTheme(PRESET_THEMES[0]);
+            }
+          }
+          setPendingDelete(null);
+        }}
+        onCancel={() => setPendingDelete(null)}
+      />
     </div>
   );
 }
