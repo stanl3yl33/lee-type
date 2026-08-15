@@ -50,12 +50,12 @@ function calculateWPM(
   wordStorage: string[],
   elapsedSeconds: number,
 ): number {
-  const correctWords = wordStorage.filter(
-    (typed, i) => typed === wordList[i],
-  ).length;
+  if (elapsedSeconds === 0) return 0;
+
+  const { correct } = calculateCharacters(wordList, wordStorage);
+
   const mins = elapsedSeconds / 60;
-  if (mins === 0) return 0;
-  return Math.round(correctWords / mins);
+  return Math.round(correct / 5 / mins);
 }
 
 /** calculates WPM based on all words regardless of correctness */
@@ -63,9 +63,11 @@ function calculateRawWPM(
   wordStorage: string[],
   elapsedSeconds: number,
 ): number {
+  if (elapsedSeconds === 0) return 0;
+
+  const totalChars = wordStorage.reduce((sum, word) => sum + word.length, 0);
   const mins = elapsedSeconds / 60;
-  if (mins === 0) return 0;
-  return Math.round(wordStorage.length / mins);
+  return Math.round(totalChars / 5 / mins);
 }
 
 /**Compares the typed characters against the expected characters */
