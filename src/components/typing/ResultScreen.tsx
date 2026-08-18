@@ -2,6 +2,7 @@
 
 import useTypingSettingsStore from "@/store/useTypingSettingsStore";
 import { TestResults } from "@/lib/calculateResults";
+import { DataPoint } from "@/hooks/useTypingGame";
 
 type ResultsScreenProps = {
   /** the calculated stats from useTypingGame */
@@ -12,6 +13,7 @@ type ResultsScreenProps = {
   mode: "time" | "words";
   /** how long the test actually took in seconds */
   elapsedSeconds: number;
+  wpmHistory: DataPoint[];
 };
 
 /**
@@ -22,13 +24,14 @@ export function ResultsScreen({
   onRestart,
   mode,
   elapsedSeconds,
+  wpmHistory,
 }: ResultsScreenProps) {
   const presetTime = useTypingSettingsStore((state) => state.timeMode.preset);
   const customTime = useTypingSettingsStore(
     (state) => state.timeMode.customDuration,
   );
   const totalTime = presetTime === "custom" ? customTime : presetTime;
-
+  // console.log(wpmHistory);
   return (
     <div className="w-full">
       {/* main stats row */}

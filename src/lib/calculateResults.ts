@@ -53,9 +53,13 @@ function calculateWPM(
   if (elapsedSeconds === 0) return 0;
 
   const { correct } = calculateCharacters(wordList, wordStorage);
+  // count spaces for correctly completed words
+  const correctSpaces = wordStorage.filter(
+    (typed, i) => typed === wordList[i],
+  ).length;
 
   const mins = elapsedSeconds / 60;
-  return Math.round(correct / 5 / mins);
+  return Math.round((correct + correctSpaces) / 5 / mins);
 }
 
 /** calculates WPM based on all words regardless of correctness */
@@ -65,7 +69,11 @@ function calculateRawWPM(
 ): number {
   if (elapsedSeconds === 0) return 0;
 
-  const totalChars = wordStorage.reduce((sum, word) => sum + word.length, 0);
+  // + 1 to account for the space bar
+  const totalChars = wordStorage.reduce(
+    (sum, word) => sum + word.length + 1,
+    0,
+  );
   const mins = elapsedSeconds / 60;
   return Math.round(totalChars / 5 / mins);
 }
