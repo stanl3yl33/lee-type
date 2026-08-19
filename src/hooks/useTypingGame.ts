@@ -58,6 +58,7 @@ function skipKeys(e: KeyboardEvent): boolean {
 export type DataPoint = {
   second: number;
   wpm: number;
+  raw: number;
   burst: number;
   errors: number;
 };
@@ -92,6 +93,16 @@ function calculateWpmAtSecond(
   }
 
   return Math.round(correctChars / 5 / (elapsedSeconds / 60));
+}
+
+/** calculates raw wpm (including all keystrokes - including backspaces etc) */
+function calculateRawWpm(
+  totalKeystrokes: number,
+  elapsedSeconds: number,
+): number {
+  if (elapsedSeconds === 0) return 0;
+
+  return Math.round(totalKeystrokes / 5 / (elapsedSeconds / 60));
 }
 
 /**
@@ -157,8 +168,22 @@ export function useTypingGame(isModalOpen: boolean = false) {
         wordList,
         finalWordStorage,
         elapsed,
+        totalKeystrokesRef.current,
       );
       setResults(finalResults);
+
+      // sync the graph's last point to finalResults so result pg can be consistent to the point on graph
+      setWpmHistory((prev) => {
+        if (prev.length === 0) return prev; // edge case: finished before any tick fired
+
+        const lastPoint = prev[prev.length - 1];
+        const syncedPoint: DataPoint = {
+          ...lastPoint,
+          wpm: finalResults.wpm,
+          raw: finalResults.rawWpm,
+        };
+        return [...prev.slice(0, -1), syncedPoint];
+      });
     },
     [wordList, totalTime],
   );
@@ -177,6 +202,7 @@ export function useTypingGame(isModalOpen: boolean = false) {
 
   const charsAtLastTickRef = useRef(0); // for burst calc - track total char type at each tick
   const errorsThisSecondRef = useRef(0);
+  const totalKeystrokesRef = useRef(0);
 
   // populate word list on mount
   useEffect(() => {
@@ -202,7 +228,7 @@ export function useTypingGame(isModalOpen: boolean = false) {
         wordStorageRef.current,
         elapsed,
       );
-
+      const raw = calculateRawWpm(totalKeystrokesRef.current, elapsed);
       const currentChars = countAllTypedChars(wordStorageRef.current);
       const charsThisSecond = currentChars - charsAtLastTickRef.current;
       const burst = Math.round((charsThisSecond / 5) * 60);
@@ -214,6 +240,7 @@ export function useTypingGame(isModalOpen: boolean = false) {
       const newPoint: DataPoint = {
         second: tickCountRef.current,
         wpm,
+        raw,
         burst,
         errors,
       };
@@ -270,6 +297,7 @@ export function useTypingGame(isModalOpen: boolean = false) {
     charsAtLastTickRef.current = 0;
     errorsThisSecondRef.current = 0;
     tickCountRef.current = 0;
+    totalKeystrokesRef.current = 0;
 
     // reset all game state
     // setWordList(generateWords());
@@ -366,7 +394,7 @@ export function useTypingGame(isModalOpen: boolean = false) {
           setIsRunning(true);
           startTimeRef.current = Date.now();
         }
-
+        totalKeystrokesRef.current += 1;
         const currentWord = wordList[currentWordIndex];
         const maxLength = currentWord ? currentWord.length + 10 : 20;
         if (typedInput.length >= maxLength) return; // stop accepting input

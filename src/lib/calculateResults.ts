@@ -64,18 +64,13 @@ function calculateWPM(
 
 /** calculates WPM based on all words regardless of correctness */
 function calculateRawWPM(
-  wordStorage: string[],
+  totalKeystrokes: number,
   elapsedSeconds: number,
 ): number {
   if (elapsedSeconds === 0) return 0;
 
-  // + 1 to account for the space bar
-  const totalChars = wordStorage.reduce(
-    (sum, word) => sum + word.length + 1,
-    0,
-  );
   const mins = elapsedSeconds / 60;
-  return Math.round(totalChars / 5 / mins);
+  return Math.round(totalKeystrokes / 5 / mins);
 }
 
 /**Compares the typed characters against the expected characters */
@@ -107,10 +102,11 @@ export function calculateResults(
   wordList: string[],
   wordStorage: string[],
   elapsedSeconds: number,
+  totalKeystrokes: number,
 ): TestResults {
   return {
     wpm: calculateWPM(wordList, wordStorage, elapsedSeconds),
-    rawWpm: calculateRawWPM(wordStorage, elapsedSeconds),
+    rawWpm: calculateRawWPM(totalKeystrokes, elapsedSeconds),
     accuracy: calculateAccuracy(wordList, wordStorage),
     characters: calculateCharacters(wordList, wordStorage),
   };

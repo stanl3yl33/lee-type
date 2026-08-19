@@ -31,7 +31,7 @@ export function ResultsScreen({
     (state) => state.timeMode.customDuration,
   );
   const totalTime = presetTime === "custom" ? customTime : presetTime;
-  // console.log(wpmHistory);
+  console.log(wpmHistory);
   return (
     <div className="w-full">
       {/* main stats row */}
