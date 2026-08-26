@@ -3,6 +3,7 @@
 import useTypingSettingsStore from "@/store/useTypingSettingsStore";
 import { TestResults } from "@/lib/calculateResults";
 import { DataPoint } from "@/hooks/useTypingGame";
+import { ResultGraph } from "../graph/ResultGraph";
 
 type ResultsScreenProps = {
   /** the calculated stats from useTypingGame */
@@ -57,9 +58,8 @@ export function ResultsScreen({
 
         {/* center column - graph placeholder for Phase 3 */}
         <div className="flex-1 flex flex-col gap-4">
-          <div className="w-full h-40 border border-gray-800 rounded flex items-center justify-center">
-            <p className="text-untyped text-sm">graph coming in Phase 3</p>
-          </div>
+          {/* <p className="text-untyped text-sm">graph coming in Phase 3</p> */}
+          <ResultGraph wpmHistory={wpmHistory} />
 
           {/* characters breakdown — correct / incorrect / extra / missed */}
           <div>
@@ -95,7 +95,7 @@ export function ResultsScreen({
         </div>
 
         {/* right column */}
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 ">
           {/* test type */}
           <div>
             <p className="text-untyped text-sm">test type</p>

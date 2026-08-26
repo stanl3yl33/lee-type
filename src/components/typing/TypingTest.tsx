@@ -70,7 +70,7 @@ export function TypingTest() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto p-8">
+    <div className="max-w-7xl mx-auto p-8">
       {isFinished ? (
         <ResultsScreen
           results={results!}
