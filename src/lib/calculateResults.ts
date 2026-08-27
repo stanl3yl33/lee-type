@@ -2,6 +2,7 @@ export type TestResults = {
   wpm: number;
   rawWpm: number;
   accuracy: number;
+  consistency: number;
   characters: CharacterCounts;
 };
 export type CharacterCounts = {
@@ -97,17 +98,48 @@ function calculateAccuracy(wordList: string[], wordStorage: string[]): number {
   return Math.round((correctChars / totalChars) * 100);
 }
 
+/**
+ * calculates -> how steady typing speed was
+ * Computed via coefficiant of varation with 'burst' as the data
+ */
+function calculateConsistency(burstValues: number[]): number {
+  if (burstValues.length === 0) return 0;
+
+  // mean
+  const mean =
+    burstValues.reduce((sum, val) => sum + val, 0) / burstValues.length;
+  if (mean === 0) return 0;
+
+  // variance
+  const variance =
+    burstValues.reduce((sum, v) => sum + (v - mean) ** 2, 0) /
+    burstValues.length;
+
+  // standard deviation
+  const stdDev = Math.sqrt(variance);
+
+  // coefficient of variation
+  const cv = stdDev / mean;
+
+  // consistency calc using tanh-based curve based on MonkeyType
+  const curve = cv + Math.pow(cv, 3) / 3;
+  // return Math.max(0, Math.min(100, Math.round(100 * (1 - Math.tanh(curve)))));
+  return Math.max(0, Math.min(100, 100 * (1 - Math.tanh(curve))));
+}
+
 /** Return all three metrics in one obj */
 export function calculateResults(
   wordList: string[],
   wordStorage: string[],
   elapsedSeconds: number,
   totalKeystrokes: number,
+  burstValues: number[],
 ): TestResults {
   return {
     wpm: calculateWPM(wordList, wordStorage, elapsedSeconds),
     rawWpm: calculateRawWPM(totalKeystrokes, elapsedSeconds),
     accuracy: calculateAccuracy(wordList, wordStorage),
+    consistency: calculateConsistency(burstValues),
     characters: calculateCharacters(wordList, wordStorage),
   };
 }

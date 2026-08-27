@@ -72,7 +72,7 @@ export function ResultsScreen({
               <div
                 className="
                 absolute bottom-full left-0 mb-2
-                bg-gray-800 text-gray-300 text-xs 
+                bg-black/85 text-untyped text-xs 
                 rounded px-3 py-2 whitespace-nowrap
                 invisible group-hover:visible
                 opacity-0 group-hover:opacity-100
@@ -87,10 +87,26 @@ export function ResultsScreen({
             </div>
           </div>
 
-          {/* consistency — placeholder until per-second WPM sampling is added */}
+          {/* consistency */}
           <div>
             <p className="text-untyped text-sm">consistency</p>
-            <p className="text-correct text-2xl">—</p>
+            <div className="relative group inline-block">
+              <p className="text-correct text-2xl cursor-default">
+                {Math.round(results.consistency)}%
+              </p>
+              <div
+                className="
+        absolute bottom-full left-0 mb-2
+        bg-black/85 text-untyped text-xs
+        rounded px-3 py-2 whitespace-nowrap
+        invisible group-hover:visible
+        opacity-0 group-hover:opacity-100
+        transition-opacity duration-150
+      "
+              >
+                {results.consistency.toFixed(2)}%
+              </div>
+            </div>
           </div>
         </div>
 

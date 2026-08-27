@@ -63,11 +63,6 @@ export type DataPoint = {
   errors: number;
 };
 
-/** counts all characters in word storage -> used for burst calc*/
-function countAllTypedChars(wordStorage: string[]): number {
-  return wordStorage.reduce((total, word) => total + word.length, 0);
-}
-
 /** Calcs cumulative WPM at given second */
 function calculateWpmAtSecond(
   wordList: string[],
@@ -164,11 +159,15 @@ export function useTypingGame(isModalOpen: boolean = false) {
         : totalTime;
 
       setElapsedSeconds(elapsed);
+
+      const burstValues = wpmHistory.map((d) => d.burst);
+
       const finalResults = calculateResults(
         wordList,
         finalWordStorage,
         elapsed,
         totalKeystrokesRef.current,
+        burstValues,
       );
       setResults(finalResults);
 
@@ -185,7 +184,7 @@ export function useTypingGame(isModalOpen: boolean = false) {
         return [...prev.slice(0, -1), syncedPoint];
       });
     },
-    [wordList, totalTime],
+    [wordList, totalTime, wpmHistory],
   );
 
   // refs for the interval data stat to prevent stale info
@@ -200,9 +199,9 @@ export function useTypingGame(isModalOpen: boolean = false) {
     wordListRef.current = wordList;
   }, [wordList]);
 
-  const charsAtLastTickRef = useRef(0); // for burst calc - track total char type at each tick
+  const keystrokesAtLastTickRef = useRef(0);
   const errorsThisSecondRef = useRef(0);
-  const totalKeystrokesRef = useRef(0);
+  const totalKeystrokesRef = useRef(0); // used for burst calc
 
   // populate word list on mount
   useEffect(() => {
@@ -229,9 +228,9 @@ export function useTypingGame(isModalOpen: boolean = false) {
         elapsed,
       );
       const raw = calculateRawWpm(totalKeystrokesRef.current, elapsed);
-      const currentChars = countAllTypedChars(wordStorageRef.current);
-      const charsThisSecond = currentChars - charsAtLastTickRef.current;
-      const burst = Math.round((charsThisSecond / 5) * 60);
+      const keyStrokesThisSecond =
+        totalKeystrokesRef.current - keystrokesAtLastTickRef.current;
+      const burst = Math.round((keyStrokesThisSecond / 5) * 60);
 
       const errors = errorsThisSecondRef.current;
 
@@ -246,7 +245,7 @@ export function useTypingGame(isModalOpen: boolean = false) {
       };
 
       // reset per-second trackers for the next tick
-      charsAtLastTickRef.current = currentChars;
+      keystrokesAtLastTickRef.current = totalKeystrokesRef.current;
       errorsThisSecondRef.current = 0;
 
       setWpmHistory((prev) => [...prev, newPoint]);
@@ -294,10 +293,10 @@ export function useTypingGame(isModalOpen: boolean = false) {
     // reset refs first — synchronous, immediate
     hasFinishedRef.current = false;
     startTimeRef.current = null;
-    charsAtLastTickRef.current = 0;
     errorsThisSecondRef.current = 0;
     tickCountRef.current = 0;
     totalKeystrokesRef.current = 0;
+    keystrokesAtLastTickRef.current = 0;
 
     // reset all game state
     // setWordList(generateWords());
