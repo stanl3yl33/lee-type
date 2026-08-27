@@ -12,6 +12,15 @@
   --font-mono: var(--font-geist-mono);
 }
 
+@theme {
+  --color-correct: #e2b6cf;
+  --color-incorrect: #ca4754;
+  --color-extra-error: #7e2a33;
+  --color-untyped: #b08fa3;
+  --color-cursor: #e2b6cf;
+  --color-accent: #e2b6cf;
+  --color-background: #2b1d2e;
+}
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
@@ -19,8 +28,23 @@
   }
 }
 
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.2s ease-out;
+}
+
 body {
-  background: var(--background);
+  /* background: var(--color-background); */
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }

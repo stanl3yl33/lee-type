@@ -1,24 +1,32 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-
-type ThemeType = "dark" | "light" | "bingsu";
+import { PRESET_THEMES, Theme } from "@/styles/themes";
 
 type ThemeState = {
-  theme: ThemeType;
-  setTheme: (value: ThemeType) => void;
+  activeTheme: Theme;
+  customThemes: Theme[];
+  setActiveTheme: (theme: Theme) => void;
+  addCustomTheme: (theme: Theme) => void;
+  removeCustomTheme: (name: string) => void;
 };
 
 const useThemeStore = create<ThemeState>()(
   persist(
     (set) => ({
-      theme: "bingsu",
-      setTheme: (opt) =>
-        set({
-          theme: opt,
-        }),
+      activeTheme: PRESET_THEMES[0],
+      customThemes: [],
+      setActiveTheme: (theme) => set({ activeTheme: theme }),
+      addCustomTheme: (theme) =>
+        set((state) => ({
+          customThemes: [...state.customThemes, theme],
+        })),
+      removeCustomTheme: (name) =>
+        set((state) => ({
+          customThemes: state.customThemes.filter((t) => t.name !== name),
+        })),
     }),
-    { name: "theme-setting-store" }
-  )
+    { name: "theme-store" },
+  ),
 );
 
 export default useThemeStore;

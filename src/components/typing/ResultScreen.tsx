@@ -2,6 +2,8 @@
 
 import useTypingSettingsStore from "@/store/useTypingSettingsStore";
 import { TestResults } from "@/lib/calculateResults";
+import { DataPoint } from "@/hooks/useTypingGame";
+import { ResultGraph } from "../graph/ResultGraph";
 
 type ResultsScreenProps = {
   /** the calculated stats from useTypingGame */
@@ -12,6 +14,7 @@ type ResultsScreenProps = {
   mode: "time" | "words";
   /** how long the test actually took in seconds */
   elapsedSeconds: number;
+  wpmHistory: DataPoint[];
 };
 
 /**
@@ -22,31 +25,32 @@ export function ResultsScreen({
   onRestart,
   mode,
   elapsedSeconds,
+  wpmHistory,
 }: ResultsScreenProps) {
   const presetTime = useTypingSettingsStore((state) => state.timeMode.preset);
   const customTime = useTypingSettingsStore(
     (state) => state.timeMode.customDuration,
   );
   const totalTime = presetTime === "custom" ? customTime : presetTime;
-
+  console.log(wpmHistory);
   return (
-    <div className="w-full font-mono">
+    <div className="w-full">
       {/* main stats row */}
       <div className="flex gap-12 items-start">
         {/* left column */}
         <div className="flex flex-col gap-4 min-w-32">
           {/* wpm */}
           <div>
-            <p className="text-gray-500 text-sm">wpm</p>
-            <p className="text-yellow-400 text-6xl font-medium leading-none">
+            <p className="text-untyped text-sm">wpm</p>
+            <p className="text-accent text-6xl font-medium leading-none">
               {results.wpm}
             </p>
           </div>
 
           {/* accuracy */}
           <div>
-            <p className="text-gray-500 text-sm">acc</p>
-            <p className="text-yellow-400 text-6xl font-medium leading-none">
+            <p className="text-untyped text-sm">acc</p>
+            <p className="text-accent text-6xl font-medium leading-none">
               {results.accuracy}%
             </p>
           </div>
@@ -54,30 +58,26 @@ export function ResultsScreen({
 
         {/* center column - graph placeholder for Phase 3 */}
         <div className="flex-1 flex flex-col gap-4">
-          <div className="w-full h-40 border border-gray-800 rounded flex items-center justify-center">
-            <p className="text-gray-700 text-sm">graph coming in Phase 3</p>
-          </div>
+          {/* <p className="text-untyped text-sm">graph coming in Phase 3</p> */}
+          <ResultGraph wpmHistory={wpmHistory} />
 
           {/* characters breakdown — correct / incorrect / extra / missed */}
           <div>
-            <p className="text-gray-500 text-sm">characters</p>
-
-            {/* group lets the tooltip react to hovering the parent */}
+            <p className="text-untyped text-sm">characters</p>
             <div className="relative group inline-block">
-              <p className="text-white text-2xl cursor-default">
+              <p className="text-correct text-2xl cursor-default">
                 {results.characters.correct}/{results.characters.incorrect}/
                 {results.characters.extra}/{results.characters.missed}
               </p>
-
               <div
                 className="
-      absolute bottom-full left-0 mb-2
-      bg-gray-800 text-gray-300 text-xs font-mono
-      rounded px-3 py-2 whitespace-nowrap
-      invisible group-hover:visible
-      opacity-0 group-hover:opacity-100
-      transition-opacity duration-150
-    "
+                absolute bottom-full left-0 mb-2
+                bg-black/85 text-untyped text-xs 
+                rounded px-3 py-2 whitespace-nowrap
+                invisible group-hover:visible
+                opacity-0 group-hover:opacity-100
+                transition-opacity duration-150
+              "
               >
                 <p>correct</p>
                 <p>incorrect</p>
@@ -87,44 +87,60 @@ export function ResultsScreen({
             </div>
           </div>
 
+          {/* consistency */}
           <div>
-            <p className="text-gray-500 text-sm">consistency</p>
-            <p className="text-white text-2xl">—</p>
+            <p className="text-untyped text-sm">consistency</p>
+            <div className="relative group inline-block">
+              <p className="text-correct text-2xl cursor-default">
+                {Math.round(results.consistency)}%
+              </p>
+              <div
+                className="
+        absolute bottom-full left-0 mb-2
+        bg-black/85 text-untyped text-xs
+        rounded px-3 py-2 whitespace-nowrap
+        invisible group-hover:visible
+        opacity-0 group-hover:opacity-100
+        transition-opacity duration-150
+      "
+              >
+                {results.consistency.toFixed(2)}%
+              </div>
+            </div>
           </div>
         </div>
 
         {/* right column */}
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 ">
           {/* test type */}
           <div>
-            <p className="text-gray-500 text-sm">test type</p>
+            <p className="text-untyped text-sm">test type</p>
             {mode === "time" ? (
               <>
-                <p className="text-yellow-400">time {totalTime}</p>
-                <p className="text-yellow-400">english</p>
+                <p className="text-accent">time {totalTime}</p>
+                <p className="text-accent">english</p>
               </>
             ) : (
               <>
-                <p className="text-yellow-400">words</p>
-                <p className="text-yellow-400">english</p>
+                <p className="text-accent">words</p>
+                <p className="text-accent">english</p>
               </>
             )}
           </div>
 
           {/* raw wpm */}
           <div>
-            <p className="text-gray-500 text-sm">raw</p>
-            <p className="text-white text-2xl">{results.rawWpm}</p>
+            <p className="text-untyped text-sm">raw</p>
+            <p className="text-correct text-2xl">{results.rawWpm}</p>
           </div>
 
           {/* time */}
           <div>
-            <p className="text-gray-500 text-sm">time</p>
+            <p className="text-untyped text-sm">time</p>
             {mode === "time" ? (
-              <p className="text-white text-2xl">{totalTime}s</p>
+              <p className="text-correct text-2xl">{totalTime}s</p>
             ) : (
-              // word mode => show total amount of time taken to type all words
-              <p className="text-white text-2xl">
+              <p className="text-correct text-2xl">
                 {Math.round(elapsedSeconds)}s
               </p>
             )}
@@ -136,7 +152,7 @@ export function ResultsScreen({
       <div className="mt-8">
         <button
           onClick={onRestart}
-          className="text-gray-500 hover:text-white transition-colors text-sm"
+          className="text-untyped hover:text-correct transition-colors text-sm"
         >
           restart
         </button>
