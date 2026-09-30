@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "d3": "^7.9.0",
+    "dotenv": "^18.0.5",
     "drizzle-orm": "^0.45.3",
     "next": "^16.2.11",
     "postgres": "^3.4.9",
