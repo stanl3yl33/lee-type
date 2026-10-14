@@ -3,6 +3,7 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import useTypingSettingsStore from "@/store/useTypingSettingsStore";
 import { WORD_BANK } from "@/data/words";
 import { calculateResults, TestResults } from "@/lib/calculateResults";
+import { saveResult } from "@/actions/saveResults";
 
 // utility functions:
 /** Picks single random word from word bank */
@@ -183,8 +184,27 @@ export function useTypingGame(isModalOpen: boolean = false) {
         };
         return [...prev.slice(0, -1), syncedPoint];
       });
+
+      saveResult({
+        wpm: finalResults.wpm,
+        rawWpm: finalResults.rawWpm,
+        accuracy: finalResults.accuracy,
+        consistency: finalResults.consistency,
+        correctChars: finalResults.characters.correct,
+        incorrectChars: finalResults.characters.incorrect,
+        extraChars: finalResults.characters.extra,
+        missedChars: finalResults.characters.missed,
+        mode,
+        testLength: mode === "time" ? totalTime : targetWordCount,
+      })
+        .then((res) => {
+          if (!res.ok && res.reason !== "signed-out") {
+            console.warn("result not saved:", res.reason);
+          }
+        })
+        .catch((err) => console.error("saveResult request failed:", err));
     },
-    [wordList, totalTime, wpmHistory],
+    [wordList, totalTime, wpmHistory, mode, targetWordCount],
   );
 
   // refs for the interval data stat to prevent stale info
