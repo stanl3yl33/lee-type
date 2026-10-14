@@ -99,6 +99,7 @@ export const test = pgTable(
     missedChars: integer("missed_chars").notNull(),
     mode: text("mode", { enum: ["time", "words"] }).notNull(),
     testLength: integer("test_length").notNull(), // time => secs | words => num of words
+    durationSeconds: real("duration_seconds"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   //index => index by userid sort by the created by
