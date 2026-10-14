@@ -23,6 +23,7 @@ export async function saveTest(input: SaveTestInput): Promise<boolean> {
     missedChars: input.missedChars,
     mode: input.mode,
     testLength: input.testLength,
+    durationSeconds: input.durationSeconds,
   });
 
   return true;

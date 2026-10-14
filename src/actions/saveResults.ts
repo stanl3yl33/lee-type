@@ -9,6 +9,7 @@ type SaveResult =
 // sanity ceilings
 const MAX_WPM = 500;
 const MAX_COUNT = 100_000;
+const MAX_DURATION_SECONDS = 86_400;
 
 // validity checks for values
 // returns bool and treat value as a number
@@ -51,6 +52,7 @@ function parseInput(raw: unknown): SaveTestInput | null {
     missedChars,
     mode,
     testLength,
+    durationSeconds,
   } = raw as Record<string, unknown>;
 
   // checking if any of the fields is of wrong type.
@@ -63,7 +65,8 @@ function parseInput(raw: unknown): SaveTestInput | null {
     !isInt(incorrectChars, 0, MAX_COUNT) ||
     !isInt(extraChars, 0, MAX_COUNT) ||
     !isInt(missedChars, 0, MAX_COUNT) ||
-    !isInt(testLength, 1, MAX_COUNT)
+    !isInt(testLength, 1, MAX_COUNT) ||
+    !isNumberInRange(durationSeconds, 0, MAX_DURATION_SECONDS)
   ) {
     return null;
   }
@@ -81,6 +84,7 @@ function parseInput(raw: unknown): SaveTestInput | null {
     missedChars,
     mode,
     testLength,
+    durationSeconds,
   };
 }
 

@@ -196,6 +196,7 @@ export function useTypingGame(isModalOpen: boolean = false) {
         missedChars: finalResults.characters.missed,
         mode,
         testLength: mode === "time" ? totalTime : targetWordCount,
+        durationSeconds: Math.round(elapsed * 100) / 100,
       })
         .then((res) => {
           if (!res.ok && res.reason !== "signed-out") {
