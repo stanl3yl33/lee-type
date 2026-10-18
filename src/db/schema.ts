@@ -8,7 +8,9 @@ import {
   integer,
   real,
   uuid,
+  jsonb,
 } from "drizzle-orm/pg-core";
+import type { DataPoint } from "@/hooks/useTypingGame";
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -100,6 +102,7 @@ export const test = pgTable(
     mode: text("mode", { enum: ["time", "words"] }).notNull(),
     testLength: integer("test_length").notNull(), // time => secs | words => num of words
     durationSeconds: real("duration_seconds"),
+    wpmHistory: jsonb("wpm_history").$type<DataPoint[]>(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   //index => index by userid sort by the created by
