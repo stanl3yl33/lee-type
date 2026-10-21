@@ -1,6 +1,8 @@
 "use server";
 
 import { saveTest, type SaveTestInput } from "@/data/tests";
+import type { DataPoint } from "@/hooks/useTypingGame";
+import { MAX_HISTORY_POINTS } from "@/lib/limits";
 
 type SaveResult =
   | { ok: true }
@@ -10,6 +12,7 @@ type SaveResult =
 const MAX_WPM = 500;
 const MAX_COUNT = 100_000;
 const MAX_DURATION_SECONDS = 86_400;
+const MAX_SERIES_VALUE = 5_000; // for graph point checks (in terms of wpm)
 
 // validity checks for values
 // returns bool and treat value as a number
@@ -36,6 +39,38 @@ function isNumberInRange(
   );
 }
 
+function parseHistory(value: unknown): DataPoint[] | null {
+  if (!Array.isArray(value)) return null; // return null if value passed is not an array
+  if (value.length === 0 || value.length > MAX_HISTORY_POINTS) return null;
+
+  const clean: DataPoint[] = [];
+  // check if array's elements are of datapoint and are within reasonable limit
+  for (const point of value) {
+    if (typeof point !== "object" || point === null) return null;
+    const {
+      second,
+      wpm,
+      raw: rawWpm,
+      burst,
+      errors,
+    } = point as Record<string, unknown>;
+
+    if (
+      !isInt(second, 1, MAX_HISTORY_POINTS) ||
+      second !== clean.length + 1 ||
+      !isInt(wpm, 0, MAX_SERIES_VALUE) ||
+      !isInt(rawWpm, 0, MAX_SERIES_VALUE) ||
+      !isInt(burst, 0, MAX_SERIES_VALUE) ||
+      !isInt(errors, 0, MAX_COUNT)
+    ) {
+      return null;
+    }
+
+    clean.push({ second, wpm, raw: rawWpm, burst, errors });
+  }
+  return clean;
+}
+
 // everything arriving is untrusted, need to check the arrived data
 function parseInput(raw: unknown): SaveTestInput | null {
   if (typeof raw !== "object" || raw === null) return null;
@@ -53,6 +88,7 @@ function parseInput(raw: unknown): SaveTestInput | null {
     mode,
     testLength,
     durationSeconds,
+    wpmHistory,
   } = raw as Record<string, unknown>;
 
   // checking if any of the fields is of wrong type.
@@ -73,6 +109,12 @@ function parseInput(raw: unknown): SaveTestInput | null {
 
   if (mode !== "time" && mode !== "words") return null;
 
+  // don't save history if its oversized or invalid.
+  const history = parseHistory(wpmHistory);
+  if (wpmHistory != null && history === null) {
+    console.warn("saveResult: wpm history rejected, saving stats only");
+  }
+
   return {
     wpm,
     rawWpm,
@@ -85,6 +127,7 @@ function parseInput(raw: unknown): SaveTestInput | null {
     mode,
     testLength,
     durationSeconds,
+    wpmHistory: history,
   };
 }
 

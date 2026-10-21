@@ -25,6 +25,7 @@ export async function saveTest(input: SaveTestInput): Promise<boolean> {
     mode: input.mode,
     testLength: input.testLength,
     durationSeconds: input.durationSeconds,
+    wpmHistory: input.wpmHistory ?? null,
   });
 
   return true;

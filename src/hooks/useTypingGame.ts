@@ -4,6 +4,7 @@ import useTypingSettingsStore from "@/store/useTypingSettingsStore";
 import { WORD_BANK } from "@/data/words";
 import { calculateResults, TestResults } from "@/lib/calculateResults";
 import { saveResult } from "@/actions/saveResults";
+import { MAX_HISTORY_POINTS } from "@/lib/limits";
 
 // utility functions:
 /** Picks single random word from word bank */
@@ -63,6 +64,17 @@ export type DataPoint = {
   burst: number;
   errors: number;
 };
+
+/** syncs last point to match actual results */
+function withSyncedLastPoint(
+  points: DataPoint[],
+  wpm: number,
+  raw: number,
+): DataPoint[] {
+  if (points.length === 0) return points;
+  const last = points[points.length - 1];
+  return [...points.slice(0, -1), { ...last, wpm, raw }];
+}
 
 /** Calcs cumulative WPM at given second */
 function calculateWpmAtSecond(
@@ -173,17 +185,13 @@ export function useTypingGame(isModalOpen: boolean = false) {
       setResults(finalResults);
 
       // sync the graph's last point to finalResults so result pg can be consistent to the point on graph
-      setWpmHistory((prev) => {
-        if (prev.length === 0) return prev; // edge case: finished before any tick fired
-
-        const lastPoint = prev[prev.length - 1];
-        const syncedPoint: DataPoint = {
-          ...lastPoint,
-          wpm: finalResults.wpm,
-          raw: finalResults.rawWpm,
-        };
-        return [...prev.slice(0, -1), syncedPoint];
-      });
+      //wpmHistory is a snapshot -> need to sync it to reflect the actual value for it to be properly saved.
+      const syncedHistory = withSyncedLastPoint(
+        wpmHistory,
+        finalResults.wpm,
+        finalResults.rawWpm,
+      );
+      setWpmHistory(syncedHistory);
 
       saveResult({
         wpm: finalResults.wpm,
@@ -197,6 +205,8 @@ export function useTypingGame(isModalOpen: boolean = false) {
         mode,
         testLength: mode === "time" ? totalTime : targetWordCount,
         durationSeconds: Math.round(elapsed * 100) / 100,
+        wpmHistory:
+          syncedHistory.length <= MAX_HISTORY_POINTS ? syncedHistory : null,
       })
         .then((res) => {
           if (!res.ok && res.reason !== "signed-out") {
