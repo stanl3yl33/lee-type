@@ -2,7 +2,7 @@ import "server-only";
 import { db } from "@/db/index";
 import { test } from "@/db/schema";
 import { getSession } from "./auth";
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 export type SaveTestInput = Omit<
   typeof test.$inferInsert,
   "id" | "userId" | "createdAt"
@@ -52,4 +52,33 @@ export async function getMyTests() {
     .where(eq(test.userId, session.user.id))
     .orderBy(desc(test.createdAt))
     .limit(50);
+}
+
+// get specific test for view test page
+export async function getMyTest(id: string) {
+  const session = await getSession();
+  if (!session) return null;
+
+  const [row] = await db
+    .select({
+      id: test.id,
+      wpm: test.wpm,
+      rawWpm: test.rawWpm,
+      accuracy: test.accuracy,
+      consistency: test.consistency,
+      correctChars: test.correctChars,
+      incorrectChars: test.incorrectChars,
+      extraChars: test.extraChars,
+      missedChars: test.missedChars,
+      mode: test.mode,
+      testLength: test.testLength,
+      durationSeconds: test.durationSeconds,
+      wpmHistory: test.wpmHistory,
+      createdAt: test.createdAt,
+    })
+    .from(test)
+    .where(and(eq(test.id, id), eq(test.userId, session.user.id)))
+    .limit(1);
+
+  return row ?? null;
 }
