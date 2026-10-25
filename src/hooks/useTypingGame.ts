@@ -135,6 +135,7 @@ export function useTypingGame(isModalOpen: boolean = false) {
     (state) => state.timeMode.customDuration,
   );
   const totalTime = presetTime === "custom" ? customTime : presetTime;
+  const testLength = mode === "time" ? totalTime : targetWordCount;
 
   const [wordList, setWordList] = useState<string[]>([]);
   const [typedInput, setTypedInput] = useState<string>("");
@@ -203,7 +204,7 @@ export function useTypingGame(isModalOpen: boolean = false) {
         extraChars: finalResults.characters.extra,
         missedChars: finalResults.characters.missed,
         mode,
-        testLength: mode === "time" ? totalTime : targetWordCount,
+        testLength,
         durationSeconds: Math.round(elapsed * 100) / 100,
         wpmHistory:
           syncedHistory.length <= MAX_HISTORY_POINTS ? syncedHistory : null,
@@ -215,7 +216,7 @@ export function useTypingGame(isModalOpen: boolean = false) {
         })
         .catch((err) => console.error("saveResult request failed:", err));
     },
-    [wordList, totalTime, wpmHistory, mode, targetWordCount],
+    [wordList, totalTime, wpmHistory, mode, testLength],
   );
 
   // refs for the interval data stat to prevent stale info
@@ -487,5 +488,6 @@ export function useTypingGame(isModalOpen: boolean = false) {
       total: targetWordCount,
     },
     wpmHistory,
+    testLength,
   };
 }

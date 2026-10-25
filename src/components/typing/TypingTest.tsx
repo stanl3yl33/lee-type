@@ -37,6 +37,7 @@ export function TypingTest() {
     isRunning,
     elapsedSeconds,
     wpmHistory,
+    testLength,
   } = useTypingGame(showCustomModal);
 
   const setMode = useTypingSettingsStore((state) => state.setMode);
@@ -78,6 +79,7 @@ export function TypingTest() {
           mode={mode}
           elapsedSeconds={elapsedSeconds}
           wpmHistory={wpmHistory}
+          testLength={testLength}
         />
       ) : (
         <>
