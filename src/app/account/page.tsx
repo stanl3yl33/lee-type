@@ -1,6 +1,10 @@
 import { redirect } from "next/navigation";
 import { getSession } from "@/data/auth";
 import { getMyTests } from "@/data/tests";
+import Link from "next/link";
+
+const ROW_GRID =
+  "grid grid-cols-[1.4fr_1fr_0.7fr_0.7fr_0.7fr_1fr_0.8fr] gap-4 px-2";
 
 export default async function AccountPage() {
   const session = await getSession();
@@ -21,47 +25,53 @@ export default async function AccountPage() {
           here.
         </p>
       ) : (
-        <table className="w-full text-left">
-          <thead>
-            <tr className="text-untyped text-sm border-b border-untyped/30">
-              <th className="py-2 font-normal">date</th>
-              <th className="py-2 font-normal">test</th>
-              <th className="py-2 font-normal">wpm</th>
-              <th className="py-2 font-normal">raw</th>
-              <th className="py-2 font-normal">acc</th>
-              <th className="py-2 font-normal">consistency</th>
-              <th className="py-2 font-normal">time</th>
-            </tr>
-          </thead>
-          <tbody>
+        <div>
+          {/* header*/}
+          <div
+            className={`${ROW_GRID} py-2 text-untyped text-sm border-b border-untyped/30`}
+          >
+            <span>date</span>
+            <span>test</span>
+            <span>wpm</span>
+            <span>raw</span>
+            <span>acc</span>
+            <span>consistency</span>
+            <span>time</span>
+          </div>
+
+          <ul>
             {tests.map((t) => (
-              <tr key={t.id} className="border-b border-untyped/10">
-                <td className="py-2 text-untyped">
-                  {t.createdAt.toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "numeric",
-                    year: "numeric",
-                  })}
-                </td>
-                <td className="py-2 text-correct">
-                  {t.mode} {t.testLength}
-                </td>
-                <td className="py-2 text-accent">{t.wpm}</td>
-                <td className="py-2 text-correct">{t.rawWpm}</td>
-                <td className="py-2 text-correct">{t.accuracy}%</td>
-                <td className="py-2 text-correct">
-                  {Math.round(t.consistency)}%
-                </td>
-                <td className="py-2 text-correct">
-                  {/* older rows saved before the column existed hold NULL */}
-                  {t.durationSeconds == null
-                    ? "—"
-                    : `${t.durationSeconds.toFixed(1)}s`}
-                </td>
-              </tr>
+              <li key={t.id}>
+                <Link
+                  href={`/account/tests/${t.id}`}
+                  className={`group ${ROW_GRID} py-2 border-b border-untyped/10 hover:bg-untyped/15 focus-visible:bg-untyped/15 transition-colors`}
+                >
+                  <span className="text-untyped group-hover:text-correct transition-colors">
+                    {t.createdAt.toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                    })}
+                  </span>
+                  <span className="text-correct">
+                    {t.mode} {t.testLength}
+                  </span>
+                  <span className="text-accent">{t.wpm}</span>
+                  <span className="text-correct">{t.rawWpm}</span>
+                  <span className="text-correct">{t.accuracy}%</span>
+                  <span className="text-correct">
+                    {Math.round(t.consistency)}%
+                  </span>
+                  <span className="text-correct">
+                    {t.durationSeconds == null
+                      ? "—"
+                      : `${t.durationSeconds.toFixed(1)}s`}
+                  </span>
+                </Link>
+              </li>
             ))}
-          </tbody>
-        </table>
+          </ul>
+        </div>
       )}
     </div>
   );
