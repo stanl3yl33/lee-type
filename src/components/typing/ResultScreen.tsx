@@ -126,7 +126,7 @@ export function ResultsScreen({
             <p className="text-untyped text-sm">time</p>
             <p className="text-correct text-2xl">
               {mode === "time"
-                ? `${testLength}'s`
+                ? `${testLength}s`
                 : elapsedSeconds == null
                   ? "-"
                   : `${Math.round(elapsedSeconds)}'s`}
