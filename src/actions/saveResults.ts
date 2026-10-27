@@ -9,8 +9,8 @@ type SaveResult =
   | { ok: false; reason: "signed-out" | "invalid" | "error" };
 
 // sanity ceilings
-const MAX_WPM = 500;
-const MAX_COUNT = 100_000;
+const MAX_WPM = 1_000;
+const MAX_COUNT = 1_000_000;
 const MAX_DURATION_SECONDS = 86_400;
 const MAX_SERIES_VALUE = 5_000; // for graph point checks (in terms of wpm)
 
