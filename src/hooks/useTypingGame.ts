@@ -3,6 +3,8 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import useTypingSettingsStore from "@/store/useTypingSettingsStore";
 import { WORD_BANK } from "@/data/words";
 import { calculateResults, TestResults } from "@/lib/calculateResults";
+import { saveResult } from "@/actions/saveResults";
+import { MAX_HISTORY_POINTS } from "@/lib/limits";
 
 // utility functions:
 /** Picks single random word from word bank */
@@ -63,6 +65,17 @@ export type DataPoint = {
   errors: number;
 };
 
+/** syncs last point to match actual results */
+function withSyncedLastPoint(
+  points: DataPoint[],
+  wpm: number,
+  raw: number,
+): DataPoint[] {
+  if (points.length === 0) return points;
+  const last = points[points.length - 1];
+  return [...points.slice(0, -1), { ...last, wpm, raw }];
+}
+
 /** Calcs cumulative WPM at given second */
 function calculateWpmAtSecond(
   wordList: string[],
@@ -122,6 +135,7 @@ export function useTypingGame(isModalOpen: boolean = false) {
     (state) => state.timeMode.customDuration,
   );
   const totalTime = presetTime === "custom" ? customTime : presetTime;
+  const testLength = mode === "time" ? totalTime : targetWordCount;
 
   const [wordList, setWordList] = useState<string[]>([]);
   const [typedInput, setTypedInput] = useState<string>("");
@@ -172,19 +186,37 @@ export function useTypingGame(isModalOpen: boolean = false) {
       setResults(finalResults);
 
       // sync the graph's last point to finalResults so result pg can be consistent to the point on graph
-      setWpmHistory((prev) => {
-        if (prev.length === 0) return prev; // edge case: finished before any tick fired
+      //wpmHistory is a snapshot -> need to sync it to reflect the actual value for it to be properly saved.
+      const syncedHistory = withSyncedLastPoint(
+        wpmHistory,
+        finalResults.wpm,
+        finalResults.rawWpm,
+      );
+      setWpmHistory(syncedHistory);
 
-        const lastPoint = prev[prev.length - 1];
-        const syncedPoint: DataPoint = {
-          ...lastPoint,
-          wpm: finalResults.wpm,
-          raw: finalResults.rawWpm,
-        };
-        return [...prev.slice(0, -1), syncedPoint];
-      });
+      saveResult({
+        wpm: finalResults.wpm,
+        rawWpm: finalResults.rawWpm,
+        accuracy: finalResults.accuracy,
+        consistency: finalResults.consistency,
+        correctChars: finalResults.characters.correct,
+        incorrectChars: finalResults.characters.incorrect,
+        extraChars: finalResults.characters.extra,
+        missedChars: finalResults.characters.missed,
+        mode,
+        testLength,
+        durationSeconds: Math.round(elapsed * 100) / 100,
+        wpmHistory:
+          syncedHistory.length <= MAX_HISTORY_POINTS ? syncedHistory : null,
+      })
+        .then((res) => {
+          if (!res.ok && res.reason !== "signed-out") {
+            console.warn("result not saved:", res.reason);
+          }
+        })
+        .catch((err) => console.error("saveResult request failed:", err));
     },
-    [wordList, totalTime, wpmHistory],
+    [wordList, totalTime, wpmHistory, mode, testLength],
   );
 
   // refs for the interval data stat to prevent stale info
@@ -456,5 +488,6 @@ export function useTypingGame(isModalOpen: boolean = false) {
       total: targetWordCount,
     },
     wpmHistory,
+    testLength,
   };
 }

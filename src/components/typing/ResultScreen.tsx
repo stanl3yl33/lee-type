@@ -1,6 +1,5 @@
 "use client";
 
-import useTypingSettingsStore from "@/store/useTypingSettingsStore";
 import { TestResults } from "@/lib/calculateResults";
 import { DataPoint } from "@/hooks/useTypingGame";
 import { ResultGraph } from "../graph/ResultGraph";
@@ -9,11 +8,11 @@ type ResultsScreenProps = {
   /** the calculated stats from useTypingGame */
   results: TestResults;
   /** called when the user clicks restart */
-  onRestart: () => void;
-  /** current selected game mode */
+  onRestart?: () => void;
   mode: "time" | "words";
-  /** how long the test actually took in seconds */
-  elapsedSeconds: number;
+  /** time mode = secs | word mode = word count*/
+  testLength: number;
+  elapsedSeconds: number | null;
   wpmHistory: DataPoint[];
 };
 
@@ -24,15 +23,10 @@ export function ResultsScreen({
   results,
   onRestart,
   mode,
+  testLength,
   elapsedSeconds,
   wpmHistory,
 }: ResultsScreenProps) {
-  const presetTime = useTypingSettingsStore((state) => state.timeMode.preset);
-  const customTime = useTypingSettingsStore(
-    (state) => state.timeMode.customDuration,
-  );
-  const totalTime = presetTime === "custom" ? customTime : presetTime;
-  console.log(wpmHistory);
   return (
     <div className="w-full">
       {/* main stats row */}
@@ -115,17 +109,10 @@ export function ResultsScreen({
           {/* test type */}
           <div>
             <p className="text-untyped text-sm">test type</p>
-            {mode === "time" ? (
-              <>
-                <p className="text-accent">time {totalTime}</p>
-                <p className="text-accent">english</p>
-              </>
-            ) : (
-              <>
-                <p className="text-accent">words</p>
-                <p className="text-accent">english</p>
-              </>
-            )}
+            <p className="text-accent">
+              {mode} {testLength}
+            </p>
+            <p className="text-accent">english</p>
           </div>
 
           {/* raw wpm */}
@@ -137,26 +124,28 @@ export function ResultsScreen({
           {/* time */}
           <div>
             <p className="text-untyped text-sm">time</p>
-            {mode === "time" ? (
-              <p className="text-correct text-2xl">{totalTime}s</p>
-            ) : (
-              <p className="text-correct text-2xl">
-                {Math.round(elapsedSeconds)}s
-              </p>
-            )}
+            <p className="text-correct text-2xl">
+              {mode === "time"
+                ? `${testLength}s`
+                : elapsedSeconds == null
+                  ? "-"
+                  : `${Math.round(elapsedSeconds)}'s`}
+            </p>
           </div>
         </div>
       </div>
 
       {/* restart button */}
-      <div className="mt-8">
-        <button
-          onClick={onRestart}
-          className="text-untyped hover:text-correct transition-colors text-sm"
-        >
-          restart
-        </button>
-      </div>
+      {onRestart && (
+        <div className="mt-8">
+          <button
+            onClick={onRestart}
+            className="text-untyped hover:text-correct transition-colors text-sm"
+          >
+            restart
+          </button>
+        </div>
+      )}
     </div>
   );
 }
