@@ -11,4 +11,12 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
   },
+  baseURL: {
+    allowedHosts: [
+      "lee-type.vercel.app",
+      "lee-type-*-stanl3yl33s-projects.vercel.app",
+      "localhost:*",
+    ],
+    fallback: process.env.BETTER_AUTH_URL,
+  },
 });
